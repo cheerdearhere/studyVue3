@@ -17,6 +17,7 @@
   <div class="usingEvent">
     <h1>Ref</h1>
     <div> Are you listen? {{afterClick}}</div>
+<!--  tag 내에서 ref(리터럴 적용)를 사용하는 경우에는 .value를 할 필요는 없음 -->
     <button
         class="btn btn-success"
         v-on:click="listeningFunction"
@@ -76,6 +77,7 @@ export default {
       toggleFlag = !toggleFlag;
       //ref에 저정된 값을 변경시킴
       afterClick.value = toggleFlag ? "Yes!" : "no...I'm waiting";//그냥 변수만 변경되고 화면은 변경안됨
+      //단 tag에서 쓰는 경우에는 .value를 안써도 됨
     }
     const changeUserData = ()=>{
       toggleFlag = !toggleFlag;
