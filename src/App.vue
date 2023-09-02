@@ -14,14 +14,24 @@
     <p class="functionCall">{{greeting("Father")}}</p>
     <p>{{myAge("1888-01-01")}}</p>
   </div>
-
+  <div class="usingEvent">
+    <h1>Event</h1>
+    <div> Are you listen? {{afterClick}}</div>
+    <button
+        class="btn btn-success"
+        v-on:click="listeningFunction"
+    >
+      Click me!
+    </button>
+  </div>
 </template>
 
 <script>
 // js code
 export default {
   setup(){//mount 할 때
-    const name = 'Ik Cho';//변수를 지정하고
+    const name = 'Ik Cho';//변수를 지정
+    let afterClick = "no";
     const greeting = (whom)=>{//함수 지정
       if(!whom)whom=name;
       return `Hi!!!! ${whom}`;
@@ -33,10 +43,15 @@ export default {
       const age = Math.floor(diff/(12*30*24*60*60*1000));
       return `I'm ${age} years old.`
     }
+    const listeningFunction = ()=>{
+      afterClick =  "Yes!";//그냥 변수만 변경되고 화면은 변경안됨
+    }
     return {
       name,//return에 obj 방식으로 이름을 입력
+      afterClick,
       greeting,//function도 export시킬 수 있음
       myAge,
+      listeningFunction,
     }
   }
 }
