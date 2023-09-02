@@ -14,6 +14,7 @@
     <p class="functionCall">{{greeting("Father")}}</p>
     <p>{{myAge("1888-01-01")}}</p>
   </div>
+  <hr/>
   <div class="usingEvent">
     <h1>Ref</h1>
     <div> Are you listen? {{afterClick}}</div>
@@ -24,6 +25,7 @@
     >
       Click me!
     </button>
+    <hr/>
     <h1>Reactive</h1>
     <button class="btn btn-outline-warning bin-block" v-on:click="changeUserData">Change</button>
     <div>
@@ -45,6 +47,7 @@
       </table>
     </div>
   </div>
+  <hr/>
   <div class="dataBind">
     <h1>Data binding</h1>
     <h5 class="label">Click: </h5>
@@ -56,6 +59,37 @@
     v-on: => @
 -->
     <input type="text" :value="userData.name" @mouseover="changeUserData"/>
+  </div>
+  <hr/>
+  <div class="useModel">
+    <h1>양방향 바인딩</h1>
+    <div class="form-group">
+      <label class="label" for="useEvent">단방향 바인딩과 이벤트를 사용해서 양방향으로 설정 &emsp;</label>
+      <input
+          id="useEvent"
+          class="form-control"
+          type="text"
+          :value="mvData"
+          @input="updateMVdata"
+          placeholder="값을 입력하고 Alert 버튼을 클릭하세요"
+      />
+    </div>
+    <button
+        class="btn btn-block btn-outline-danger"
+        @click="onSubmit"
+    >
+      Alert!!
+    </button>
+    <div class="form-group">
+      <label class="label" for="useVModel">같은 기능을 v-model 하나로 처리할 수 있음 &emsp; </label>
+      <input
+          id="useVModel"
+          class="form-control"
+          type="text"
+          v-model="mvData"
+          placeholder="값을 입력하고 Alert 버튼을 클릭하세요"
+      />
+    </div>
   </div>
 </template>
 
@@ -77,6 +111,13 @@
       });
       let toggleType = ref("text");
       let toggleClass = ref("red");
+      const mvData = ref("");
+      const onSubmit = ()=>{
+        alert(mvData.value);
+      };
+      const updateMVdata = (e)=>{
+        mvData.value = e.target.value;
+      }
       // functions
       const greeting = (whom)=>{//함수 지정
         if(!whom)whom=name;
@@ -110,12 +151,13 @@
         userData,
         toggleType,
         toggleClass,
-
+        mvData,
         greeting,//function도 export시킬 수 있음
         myAge,
         listeningFunction,
         changeUserData,
-
+        onSubmit,
+        updateMVdata,
       }
     }
   }
@@ -123,6 +165,10 @@
 
 <style>
   // stylesheet code
+  body{
+    padding-bottom: 10%;
+    padding-left: 5%;
+  }
   div{
     background: #fff;
     color:#000;
@@ -149,4 +195,5 @@
   .blueName {
     background-color:blue;
   }
+
 </style>
