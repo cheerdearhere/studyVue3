@@ -15,7 +15,7 @@
     <p>{{myAge("1888-01-01")}}</p>
   </div>
   <div class="usingEvent">
-    <h1>Event</h1>
+    <h1>Ref</h1>
     <div> Are you listen? {{afterClick}}</div>
     <button
         class="btn btn-success"
@@ -23,15 +23,44 @@
     >
       Click me!
     </button>
+    <h1>Reactive</h1>
+    <button class="btn btn-warning" v-on:click="changeUserData">Change</button>
+    <div>
+      <table class="table table-hover table-border">
+        <thead>
+          <tr>
+            <th>id</th>
+            <th>name</th>
+            <th>phone</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{userData.id}}</td>
+            <td>{{userData.name}}</td>
+            <td>{{userData.phone}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <script>
+//import 영역
+import { ref } from 'vue';//리터럴인 경우
+import {reactive} from "vue";//list, obj 등 자료형인 경우
 // js code
 export default {
   setup(){//mount 할 때
     const name = 'Ik Cho';//변수를 지정
-    let afterClick = "no";
+    let afterClick = ref("no...I'm waiting");
+    let toggleFlag =false;
+    const userData = reactive({
+      id:"1",
+      name:"김",
+      phone:"009",
+    })
     const greeting = (whom)=>{//함수 지정
       if(!whom)whom=name;
       return `Hi!!!! ${whom}`;
@@ -44,14 +73,24 @@ export default {
       return `I'm ${age} years old.`
     }
     const listeningFunction = ()=>{
-      afterClick =  "Yes!";//그냥 변수만 변경되고 화면은 변경안됨
+      toggleFlag = !toggleFlag;
+      //ref에 저정된 값을 변경시킴
+      afterClick.value = toggleFlag ? "Yes!" : "no...I'm waiting";//그냥 변수만 변경되고 화면은 변경안됨
+    }
+    const changeUserData = ()=>{
+      toggleFlag = !toggleFlag;
+      userData.id     = toggleFlag ? "2" : "1";
+      userData.name   = toggleFlag ? "홍" : "김";
+      userData.phone  = toggleFlag ? "00100" : "009";
     }
     return {
       name,//return에 obj 방식으로 이름을 입력
       afterClick,
+      userData,
       greeting,//function도 export시킬 수 있음
       myAge,
       listeningFunction,
+      changeUserData,
     }
   }
 }
