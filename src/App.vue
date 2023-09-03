@@ -136,9 +136,16 @@
             Add todo list
           </button>
       </form>
-      <div class="todoList2 card"></div>
+      <div
+        v-for="(value,index) in todoList2"
+        :key="value.id"
+        class="todoList2 card mt-2"
+      >
+        <div class="card-body p-2">
+          <h5>{{index+1}}. {{value.subject}}</h5>
+        </div>
+      </div>
     </div>
-
   </div>
 </template>
 
@@ -192,22 +199,7 @@
           id: Date.now(),// ms로 id사용
           subject:todo2.value,//내용
         });
-        if(todoList2.value.length > 0){
-          let card;
-          let cardList=[];
-          const targetEL = document.querySelector(".todoList2");
-          targetEL.innerHTML = "";
-          todoList2.value.forEach((item,idx)=>{
-            card = `
-              <div class="card-body p-2">
-                <h3>${idx+1}. ${item?.id}</h3>
-                <p>${item?.subject}</p>
-              </div>`;
-            cardList.push(card);
-          });
-          cardList.forEach(item=>targetEL.innerHTML+=item);
-          todo2.value="";
-        }
+        todo2.value="";
       }
       const onSubmit = ()=>{
         alert(mvData.value);
