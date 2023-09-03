@@ -29,7 +29,7 @@
     <h1>Reactive</h1>
     <button class="btn btn-outline-warning bin-block" v-on:click="changeUserData">Change</button>
     <div>
-      <table class="table table-hover table-border">
+      <table class="table table-border">
         <thead>
           <tr>
             <th>id</th>
@@ -151,8 +151,7 @@
 
 <script>
   //import 영역
-  import { ref } from 'vue';//리터럴인 경우
-  import {reactive} from "vue";//list, obj 등 자료형인 경우
+  import { ref, reactive } from 'vue';
   // codes
   export default {
     setup(){//mount 할 때
