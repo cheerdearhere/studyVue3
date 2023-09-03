@@ -91,6 +91,55 @@
       />
     </div>
   </div>
+  <div class="todoContainer container">
+    <h1>직접 만든 todo list</h1>
+    <div class="form-group">
+      <label for="todo">To-Do list</label>
+      <input
+          class="form-control"
+          id="todo"
+          type="text"
+          placeholder="new Todo"
+          v-model="todo"
+          @keydown="autoSubmit"
+      />
+      <button
+          class="btn btn-block btn-outline-primary"
+          @click="addTodoList"
+      >
+        Add todo list
+      </button>
+    </div>
+    <ul class="todoList"></ul>
+  </div>
+  <div class="todoContainer container">
+    <h1>강의에 나온 todo list</h1>
+    <div>
+      <form
+          class="d-flex"
+          @submit.prevent="addTodoList2"
+      >
+      <!--@submit.prevent: event modifier (이벤트와 관련된처리를 함)          -->
+        <div class="flex-grow-1 mr-2">
+          <input
+              id="todo2"
+              class="form-control"
+              type="text"
+              placeholder="new Todo"
+              v-model="todo2"
+          />
+        </div>
+          <button
+              class="btn btn-sm btn-outline-dark"
+              type="submit"
+          >
+            Add todo list
+          </button>
+      </form>
+      <div class="todoList2 card"></div>
+    </div>
+
+  </div>
 </template>
 
 <script>
@@ -112,6 +161,54 @@
       let toggleType = ref("text");
       let toggleClass = ref("red");
       const mvData = ref("");
+      let todo=ref("");
+      const todoList = reactive([]);
+      const autoSubmit=(e)=>{
+        if(e.keyCode===13){
+          addTodoList();
+        }
+      }
+      const addTodoList=()=>{
+        todoList.push(todo.value);
+        if(todoList.length > 0){
+          let li;
+          let liList=[];
+          const targetEL = document.querySelector(".todoList");
+          targetEL.innerHTML = "";
+          todoList.forEach((item,idx)=>{
+            li = `<li>${idx+1}. ${item}</li>`;
+            liList.push(li);
+          });
+          liList.forEach(item=>targetEL.innerHTML+=item);
+          todo.value="";
+        }
+      }
+      /* 강의의 내용을 적용 */
+      let todo2=ref("");
+      const todoList2 = ref([]);
+      const addTodoList2=()=>{
+        // e.preventDefault();//form이라 우선 막음 - 서버 연결시 처리
+        todoList2.value.push({
+          id: Date.now(),// ms로 id사용
+          subject:todo2.value,//내용
+        });
+        if(todoList2.value.length > 0){
+          let card;
+          let cardList=[];
+          const targetEL = document.querySelector(".todoList2");
+          targetEL.innerHTML = "";
+          todoList2.value.forEach((item,idx)=>{
+            card = `
+              <div class="card-body p-2">
+                <h3>${idx+1}. ${item?.id}</h3>
+                <p>${item?.subject}</p>
+              </div>`;
+            cardList.push(card);
+          });
+          cardList.forEach(item=>targetEL.innerHTML+=item);
+          todo2.value="";
+        }
+      }
       const onSubmit = ()=>{
         alert(mvData.value);
       };
@@ -152,6 +249,14 @@
         toggleType,
         toggleClass,
         mvData,
+        todo,
+        todoList,
+        todo2,
+        todoList2,
+
+        addTodoList,
+        autoSubmit,
+        addTodoList2,
         greeting,//function도 export시킬 수 있음
         myAge,
         listeningFunction,
