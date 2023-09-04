@@ -7,7 +7,7 @@
   </div>
   <!-- vue3 변경점 -->
   <p class="content">vue2에서는 root tag가 하나여야했지만 vue3에서는 루트태그가 하나가 아니어도 된다</p>
-  <div>
+  <div class="functionCall">
     <h1>Call Function!</h1>
     <p class="functionStrCall">{{greeting}}</p>
     <p class="functionCall">{{greeting()}}</p>
@@ -116,25 +116,29 @@
     <h1>강의에 나온 todo list</h1>
     <div>
       <form
-          class="d-flex"
           @submit.prevent="addTodoList2"
       >
-      <!--@submit.prevent: event modifier (이벤트와 관련된처리를 함)          -->
-        <div class="flex-grow-1 mr-2">
-          <input
-              id="todo2"
-              class="form-control"
-              type="text"
-              placeholder="new Todo"
-              v-model="todo2"
-          />
+        <!--@submit.prevent: event modifier (이벤트와 관련된처리를 함)          -->
+        <div class="d-flex">
+          <div class="flex-grow-1 mr-2">
+            <input
+                id="todo2"
+                class="form-control"
+                type="text"
+                placeholder="new Todo"
+                v-model="todo2"
+            />
+          </div>
+          <div>
+            <button
+                class="btn btn-sm btn-outline-dark"
+                type="submit"
+            >
+              Add todo list
+            </button>
+          </div>
         </div>
-          <button
-              class="btn btn-sm btn-outline-dark"
-              type="submit"
-          >
-            Add todo list
-          </button>
+        <div class="errorMsg" v-show="hasError">Error: This field cannot be empty!</div>
       </form>
       <div
         v-for="(value,index) in todoList2"
@@ -147,6 +151,20 @@
       </div>
     </div>
   </div>
+  <div class="show">
+    <div v-show="toggle">true</div>
+    <div v-show="!toggle">false</div>
+  </div>
+  <div class="if">
+    <div v-if="toggle">if:true</div>
+<!--    <div v-else-if="조건">else-if</div>-->
+    <div v-else>else:false</div>
+  </div>
+  <div  class="inSquare" @mouseover="upTrue" @mouseleave="downFalse">
+    마우스를 올려볼래?
+    <p>v-show는 랜더링 비용이 크기때문에 자주 바뀌는 경우에 사용</p>
+    <p>v-if/else-if/else는 토글 비용이 크기때문에 자주 바뀌지 않는 경우에 사용</p>
+  </div>
 </template>
 
 <script>
@@ -156,6 +174,10 @@
   export default {
     setup(){//mount 할 때
       // variables
+      const hasError = ref(false);
+      const toggle=ref(true);
+      const upTrue=()=>toggle.value=true;
+      const downFalse=()=>toggle.value=false;
       const name = 'Ik Cho';//변수를 지정
       let afterClick = ref("no...I'm waiting");
       let toggleFlag =false;
@@ -193,12 +215,17 @@
       let todo2=ref("");
       const todoList2 = ref([]);
       const addTodoList2=()=>{
-        // e.preventDefault();//form이라 우선 막음 - 서버 연결시 처리
-        todoList2.value.push({
-          id: Date.now(),// ms로 id사용
-          subject:todo2.value,//내용
-        });
-        todo2.value="";
+        // e.preventDefault();//form이라 우선 막음 - @onclick.prevent로
+        if(todo2.value===""){
+          hasError.value=true;
+        }else{
+          todoList2.value.push({
+            id: Date.now(),// ms로 id사용
+            subject:todo2.value,//내용
+          });
+          todo2.value="";
+          hasError.value=false;
+        }
       }
       const onSubmit = ()=>{
         alert(mvData.value);
@@ -244,6 +271,8 @@
         todoList,
         todo2,
         todoList2,
+        toggle,
+        hasError,
 
         addTodoList,
         autoSubmit,
@@ -254,6 +283,8 @@
         changeUserData,
         onSubmit,
         updateMVdata,
+        upTrue,
+        downFalse,
       }
     }
   }
@@ -262,8 +293,9 @@
 <style>
   // stylesheet code
   body{
-    padding-bottom: 10%;
-    padding-left: 5%;
+    width: 100%;
+    height: 100%;
+    margin: 5%;
   }
   div{
     background: #fff;
@@ -291,5 +323,15 @@
   .blueName {
     background-color:blue;
   }
-
+  .inSquare{
+    height:50px;
+    background: #000;
+    color: #fff;
+  }
+  .errorMsg{
+    font-size: smaller;
+    font-weight: bolder;
+    color:red;
+    background: #000;
+  }
 </style>
