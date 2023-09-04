@@ -112,6 +112,22 @@
     </div>
     <ul class="todoList"></ul>
   </div>
+  <div class="show">
+    <div v-show="toggle">true</div>
+    <div v-show="!toggle">false</div>
+  </div>
+  <div class="if">
+    <div v-if="toggle">if:true</div>
+    <!--    <div v-else-if="조건">else-if</div>-->
+    <div v-else>else:false</div>
+  </div>
+  <div  class="inSquare" @mouseover="upTrue" @mouseleave="downFalse">
+    마우스를 올려볼래?
+    <p>v-show는 랜더링 비용이 크기때문에 자주 바뀌는 경우에 사용</p>
+    <p>v-if/else-if/else는 토글 비용이 크기때문에 자주 바뀌지 않는 경우에 사용</p>
+  </div>
+  <hr/>
+  <hr/>
   <div class="todoContainer container">
     <h1>강의에 나온 todo list</h1>
     <div>
@@ -146,25 +162,19 @@
         class="todoList2 card mt-2"
       >
         <div class="card-body p-2">
-          <h5>{{index+1}}. {{value.subject}}</h5>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" v-model="value.completed"/>
+            <label class="form-check-label">
+              <h5 class="todoLabel">
+                {{index+1}}. {{value.subject}}
+              </h5>
+            </label>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="show">
-    <div v-show="toggle">true</div>
-    <div v-show="!toggle">false</div>
-  </div>
-  <div class="if">
-    <div v-if="toggle">if:true</div>
-<!--    <div v-else-if="조건">else-if</div>-->
-    <div v-else>else:false</div>
-  </div>
-  <div  class="inSquare" @mouseover="upTrue" @mouseleave="downFalse">
-    마우스를 올려볼래?
-    <p>v-show는 랜더링 비용이 크기때문에 자주 바뀌는 경우에 사용</p>
-    <p>v-if/else-if/else는 토글 비용이 크기때문에 자주 바뀌지 않는 경우에 사용</p>
-  </div>
+  <div class="footer"></div>
 </template>
 
 <script>
@@ -222,6 +232,7 @@
           todoList2.value.push({
             id: Date.now(),// ms로 id사용
             subject:todo2.value,//내용
+            completed:false,//완료
           });
           todo2.value="";
           hasError.value=false;
@@ -333,5 +344,12 @@
     font-weight: bolder;
     color:red;
     background: #000;
+  }
+  .todoLabel{
+    display: inline-block;
+  }
+  .footer{
+    height:20px;
+    width:100vw;
   }
 </style>
