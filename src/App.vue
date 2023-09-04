@@ -165,7 +165,17 @@
           <div class="form-check">
             <input class="form-check-input" type="checkbox" v-model="value.completed"/>
             <label class="form-check-label">
-              <h5 class="todoLabel">
+              <!--      css 바인딩 : object -->
+              <h5
+                class="todoLabel"
+                :style="value.completed ? todoStyle:{}"
+              >
+              <!--      css 바인딩 : class 사용
+              <h5
+                  class="todoLabel"
+                  :class="{completedTodo: value.completed }"
+              >
+              -->
                 {{index+1}}. {{value.subject}}
               </h5>
             </label>
@@ -188,6 +198,12 @@
       const toggle=ref(true);
       const upTrue=()=>toggle.value=true;
       const downFalse=()=>toggle.value=false;
+      const todoStyle  = {//jsx문법때처럼 -이 아닌 camelCase로 지정
+        textDecoration: 'line-through',
+        color: 'lightGray',
+      }
+
+
       const name = 'Ik Cho';//변수를 지정
       let afterClick = ref("no...I'm waiting");
       let toggleFlag =false;
@@ -284,6 +300,7 @@
         todoList2,
         toggle,
         hasError,
+        todoStyle,
 
         addTodoList,
         autoSubmit,
@@ -351,5 +368,9 @@
   .footer{
     height:20px;
     width:100vw;
+  }
+  .completedTodo{
+    text-decoration: line-through;
+    color:lightgray;
   }
 </style>
