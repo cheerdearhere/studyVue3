@@ -156,14 +156,19 @@
         </div>
         <div class="errorMsg" v-show="hasError">Error: This field cannot be empty!</div>
       </form>
+      <div v-if="!todoList2.length">
+        작성된 내역이 없습니다.
+      </div>
       <div
         v-for="(value,index) in todoList2"
         :key="value.id"
         class="todoList2 card mt-2"
       >
-        <div class="card-body p-2">
-          <div class="form-check">
+        <div class="card-body p-2 d-flex align-items-center">
+          <div class="form-check flex-grow-1">
+            &emsp;
             <input class="form-check-input" type="checkbox" v-model="value.completed"/>
+            &emsp;
             <label class="form-check-label">
               <!--      css 바인딩 : object -->
               <h5
@@ -180,6 +185,14 @@
               </h5>
             </label>
           </div>
+          <div>
+            <button
+              class="btn btn-outline-danger btn-sm"
+              @click="deleteTodo(index)"
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -193,7 +206,7 @@
   // codes
   export default {
     setup(){//mount 할 때
-      // variables
+      /* 강의의 내용을 적용 */
       const hasError = ref(false);
       const toggle=ref(true);
       const upTrue=()=>toggle.value=true;
@@ -202,8 +215,27 @@
         textDecoration: 'line-through',
         color: 'lightGray',
       }
+      let todo2=ref("");
+      const todoList2 = ref([]);
+      const addTodoList2=()=>{
+        // e.preventDefault();//form이라 우선 막음 - @onclick.prevent로
+        if(todo2.value===""){
+          hasError.value=true;
+        }else{
+          todoList2.value.push({
+            id: Date.now(),// ms로 id사용
+            subject:todo2.value,//내용
+            completed:false,//완료
+          });
+          todo2.value="";
+          hasError.value=false;
+        }
+      }
+      const deleteTodo=(idx)=>{
+        todoList2.value.splice(idx,1);
+      }
 
-
+      // variables
       const name = 'Ik Cho';//변수를 지정
       let afterClick = ref("no...I'm waiting");
       let toggleFlag =false;
@@ -235,23 +267,6 @@
           });
           liList.forEach(item=>targetEL.innerHTML+=item);
           todo.value="";
-        }
-      }
-      /* 강의의 내용을 적용 */
-      let todo2=ref("");
-      const todoList2 = ref([]);
-      const addTodoList2=()=>{
-        // e.preventDefault();//form이라 우선 막음 - @onclick.prevent로
-        if(todo2.value===""){
-          hasError.value=true;
-        }else{
-          todoList2.value.push({
-            id: Date.now(),// ms로 id사용
-            subject:todo2.value,//내용
-            completed:false,//완료
-          });
-          todo2.value="";
-          hasError.value=false;
         }
       }
       const onSubmit = ()=>{
@@ -286,6 +301,7 @@
         userData.name   = toggleFlag ? "홍" : "김";
         userData.phone  = toggleFlag ? "00100" : "009";
       }
+
       //export returns
       return {
         name,//return에 obj 방식으로 이름을 입력
@@ -302,6 +318,7 @@
         hasError,
         todoStyle,
 
+        deleteTodo,
         addTodoList,
         autoSubmit,
         addTodoList2,
