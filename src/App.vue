@@ -130,71 +130,24 @@
   <hr/>
   <div class="todoContainer container">
     <h1>강의에 나온 todo list</h1>
+<!--  3. 태그입력  -->
     <div>
-      <form
-          @submit.prevent="addTodoList2"
-      >
-        <!--@submit.prevent: event modifier (이벤트와 관련된처리를 함)          -->
-        <div class="d-flex">
-          <div class="flex-grow-1 mr-2">
-            <input
-                id="todo2"
-                class="form-control"
-                type="text"
-                placeholder="new Todo"
-                v-model="todo2"
-            />
-          </div>
-          <div>
-            <button
-                class="btn btn-sm btn-outline-dark"
-                type="submit"
-            >
-              Add todo list
-            </button>
-          </div>
-        </div>
-        <div class="errorMsg" v-show="hasError">Error: This field cannot be empty!</div>
-      </form>
+<!--  4. 전달 받기: context.emit  -->
+      <TodoSimpleForm
+          @add-todo="addTodoList2"
+      />
       <div v-if="!todoList2.length">
         작성된 내역이 없습니다.
       </div>
-      <div
-        v-for="(value,index) in todoList2"
-        :key="value.id"
-        class="todoList2 card mt-2"
-      >
-        <div class="card-body p-2 d-flex align-items-center">
-          <div class="form-check flex-grow-1">
-            &emsp;
-            <input class="form-check-input" type="checkbox" v-model="value.completed"/>
-            &emsp;
-            <label class="form-check-label">
-              <!--      css 바인딩 : object -->
-              <h5
-                class="todoLabel"
-                :style="value.completed ? todoStyle:{}"
-              >
-              <!--      css 바인딩 : class 사용
-              <h5
-                  class="todoLabel"
-                  :class="{completedTodo: value.completed }"
-              >
-              -->
-                {{index+1}}. {{value.subject}}
-              </h5>
-            </label>
-          </div>
-          <div>
-            <button
-              class="btn btn-outline-danger btn-sm"
-              @click="deleteTodo(index)"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      </div>
+<!--  5. 전달 하기: props v-bind(:)로 전달
+        one way binding: 부모에서 자식으로만 보낼 수 있음
+-->
+      <TodoList
+        :todoList="todoList2"
+        :todoStyle="todoStyle"
+        @delete-todo="deleteTodo"
+        @toggle-todo="toggleTodo"
+      />
     </div>
   </div>
   <div class="footer"></div>
@@ -203,8 +156,16 @@
 <script>
   //import 영역
   import { ref, reactive } from 'vue';
+  /*1. component import*/
+  import TodoSimpleForm from "@/components/TodoSimpleForm.vue";
+  import TodoList from "@/components/TodoList.vue";
   // codes
   export default {
+    /* 2. component 등록 */
+    components:{
+      TodoSimpleForm,
+      TodoList,
+    },
     setup(){//mount 할 때
       /* 강의의 내용을 적용 */
       const hasError = ref(false);
@@ -217,19 +178,12 @@
       }
       let todo2=ref("");
       const todoList2 = ref([]);
-      const addTodoList2=()=>{
-        // e.preventDefault();//form이라 우선 막음 - @onclick.prevent로
-        if(todo2.value===""){
-          hasError.value=true;
-        }else{
-          todoList2.value.push({
-            id: Date.now(),// ms로 id사용
-            subject:todo2.value,//내용
-            completed:false,//완료
-          });
-          todo2.value="";
-          hasError.value=false;
-        }
+      const addTodoList2=(todo)=>{
+        //context.emit(데이터이름,데이터 obj)에서 전달받은 것
+        todoList2.value.push(todo);
+      }
+      const toggleTodo=(idx)=>{
+        todoList2.value[idx].completed = !todoList2.value[idx].completed;
       }
       const deleteTodo=(idx)=>{
         todoList2.value.splice(idx,1);
@@ -319,6 +273,7 @@
         todoStyle,
 
         deleteTodo,
+        toggleTodo,
         addTodoList,
         autoSubmit,
         addTodoList2,
