@@ -130,39 +130,52 @@
   <hr/>
   <div class="todoContainer container">
     <h1>강의에 나온 todo list</h1>
+    <input
+        id="todo2"
+        class="form-control"
+        type="text"
+        placeholder="Search"
+        v-model="searchText"
+    />
+
 <!--  3. 태그입력  -->
     <div>
 <!--  4. 전달 받기: context.emit  -->
       <TodoSimpleForm
           @add-todo="addTodoList2"
       />
-      <div v-if="!todoList2.length">
+      <div v-if="!filteredTodoList.length">
         작성된 내역이 없습니다.
       </div>
 <!--  5. 전달 하기: props v-bind(:)로 전달
         one way binding: 부모에서 자식으로만 보낼 수 있음
 -->
       <TodoList
-        :todoList="todoList2"
+        :todoList="filteredTodoList"
         :todoStyle="todoStyle"
         @delete-todo="deleteTodo"
         @toggle-todo="toggleTodo"
       />
     </div>
   </div>
+  <div class="computed">
+    <ComputedCount/>
+  </div>
   <div class="footer"></div>
 </template>
 
 <script>
   //import 영역
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, computed } from 'vue';
   /*1. component import*/
   import TodoSimpleForm from "@/components/TodoSimpleForm.vue";
   import TodoList from "@/components/TodoList.vue";
+  import ComputedCount from "@/components/ComputedCount.vue";
   // codes
   export default {
     /* 2. component 등록 */
     components:{
+      ComputedCount,
       TodoSimpleForm,
       TodoList,
     },
@@ -189,6 +202,15 @@
         todoList2.value.splice(idx,1);
       }
 
+      const searchText = ref('');
+      const filteredTodoList = computed(()=>{
+        if(searchText.value){
+          return todoList2.value.filter(todo=>{
+            return todo.subject.includes(searchText.value)
+          })
+        }
+        return todoList2.value
+      });
       // variables
       const name = 'Ik Cho';//변수를 지정
       let afterClick = ref("no...I'm waiting");
@@ -271,6 +293,8 @@
         toggle,
         hasError,
         todoStyle,
+        searchText,
+        filteredTodoList,
 
         deleteTodo,
         toggleTodo,
