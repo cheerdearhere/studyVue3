@@ -10,7 +10,7 @@
         <input
           class="form-check-input"
           type="checkbox"
-          :value="value.completed"
+          :checked="value.completed"
           @change="toggleTodo(index)"
         />
         <!-- v-model="value.completed"

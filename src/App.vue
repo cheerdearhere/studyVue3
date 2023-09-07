@@ -194,14 +194,15 @@
       const todoList2 = ref([]);
       const error = ref('');
       const getTodos = async ()=>{
+        error.value='';
         try{
           const rs = await axios.get('http://localhost:3000/todos');
           todoList2.value = rs.data;
         }catch (err){
-          console.log(err);
+          error.value=`Server error: 관리자에게 문의하세요 \n ${err}`
         }
       }
-      getTodos();
+      getTodos();//mount 실행
       const addTodoList2 = (todo) => {
         //json-server db.json > 가상db(REST API)
         //axios를 사용해 서버로 전송 > db.json에 저장
@@ -217,11 +218,31 @@
           // todoList2.value.push(rs.data);
         }).catch(err=>error.value=`Server error: 관리자에게 문의하세요 \n ${err}`);
       }
-      const toggleTodo=(idx)=>{
-        todoList2.value[idx].completed = !todoList2.value[idx].completed;
+      const toggleTodo=async (idx)=>{
+        error.value='';
+        const id = todoList2.value[idx].id;
+        try{
+          const result = await axios.patch(`http://localhost:3000/todos/${id}`,{
+            completed: !todoList2.value[idx].completed,
+          });
+          console.log(result);
+          alert(`${idx} 번 -완-`);
+        }catch (err){
+          error.value=`Server error: 관리자에게 문의하세요 \n ${err}`;
+        }finally {
+          getTodos().catch(err=>error.value=`Server error: 관리자에게 문의하세요 \n ${err}`);
+        }
       }
       const deleteTodo=(idx)=>{
-        todoList2.value.splice(idx,1);
+        error.value='';
+        const id = todoList2.value[idx].id;
+        axios.delete(`http://localhost:3000/todos/${id}`)
+          .then(rs=>{
+            todoList2.value.splice(idx,1);
+            console.log(rs);
+            alert(`데이터가 삭제됨`);
+          })
+          .catch(err=>error.value=`Server error: 관리자에게 문의하세요 \n ${err}`);
       }
 
       const searchText = ref('');
