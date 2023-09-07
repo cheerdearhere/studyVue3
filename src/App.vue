@@ -137,13 +137,13 @@
         placeholder="Search"
         v-model="searchText"
     />
-
 <!--  3. 태그입력  -->
     <div>
 <!--  4. 전달 받기: context.emit  -->
       <TodoSimpleForm
           @add-todo="addTodoList2"
       />
+      <div v-if="error" class="errorMsg">{{error}}</div>
       <div v-if="!filteredTodoList.length">
         작성된 내역이 없습니다.
       </div>
@@ -167,6 +167,7 @@
 <script>
   //import 영역
   import { ref, reactive, computed } from 'vue';
+  import axios from "axios";
   /*1. component import*/
   import TodoSimpleForm from "@/components/TodoSimpleForm.vue";
   import TodoList from "@/components/TodoList.vue";
@@ -191,9 +192,21 @@
       }
       let todo2=ref("");
       const todoList2 = ref([]);
-      const addTodoList2=(todo)=>{
-        //context.emit(데이터이름,데이터 obj)에서 전달받은 것
-        todoList2.value.push(todo);
+      const error = ref('');
+      const addTodoList2=async (todo)=>{
+        //json-server db.json > 가상db(REST API)
+        //axios를 사용해 서버로 전송 > db.json에 저장
+        error.value= '';
+        //서버(지금은 임시)로 전달
+        await axios.post('http://localhost:3000/todos',{
+          subject: todo.subject,
+          completed: todo.completed,
+        }).then(rs=>{
+          console.log(rs);
+          //context.emit(데이터이름,데이터 obj)에서 전달받은 것
+          todoList2.value.push(rs.data);
+        }).catch(err=>error.value=`Server error: 관리자에게 문의하세요 \n ${err}`);
+
       }
       const toggleTodo=(idx)=>{
         todoList2.value[idx].completed = !todoList2.value[idx].completed;
@@ -295,6 +308,7 @@
         todoStyle,
         searchText,
         filteredTodoList,
+        error,
 
         deleteTodo,
         toggleTodo,
