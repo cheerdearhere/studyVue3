@@ -193,20 +193,29 @@
       let todo2=ref("");
       const todoList2 = ref([]);
       const error = ref('');
-      const addTodoList2=async (todo)=>{
+      const getTodos = async ()=>{
+        try{
+          const rs = await axios.get('http://localhost:3000/todos');
+          todoList2.value = rs.data;
+        }catch (err){
+          console.log(err);
+        }
+      }
+      getTodos();
+      const addTodoList2 = (todo) => {
         //json-server db.json > 가상db(REST API)
         //axios를 사용해 서버로 전송 > db.json에 저장
         error.value= '';
         //서버(지금은 임시)로 전달
-        await axios.post('http://localhost:3000/todos',{
+        axios.post('http://localhost:3000/todos',{
           subject: todo.subject,
           completed: todo.completed,
         }).then(rs=>{
           console.log(rs);
+          alert(`데이터가 추가됨 \n id: ${rs.data.id}/ subject: ${rs.data.subject}`);
           //context.emit(데이터이름,데이터 obj)에서 전달받은 것
-          todoList2.value.push(rs.data);
+          // todoList2.value.push(rs.data);
         }).catch(err=>error.value=`Server error: 관리자에게 문의하세요 \n ${err}`);
-
       }
       const toggleTodo=(idx)=>{
         todoList2.value[idx].completed = !todoList2.value[idx].completed;
@@ -309,7 +318,7 @@
         searchText,
         filteredTodoList,
         error,
-
+        getTodos,
         deleteTodo,
         toggleTodo,
         addTodoList,
