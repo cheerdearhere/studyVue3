@@ -28,7 +28,7 @@
                 :class="{completedTodo: value.completed }"
             >
             -->
-            {{index+1}}. {{value.subject}}
+            {{value.id}}. {{value.subject}}
           </h5>
         </label>
       </div>
