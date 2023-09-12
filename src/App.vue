@@ -68,7 +68,7 @@
 
 <script>
   //import 영역
-  import {ref, computed, watchEffect, reactive} from 'vue';
+  import {ref, computed, watchEffect, reactive, watch} from 'vue';
   import axios from "axios";
   /*1. component import*/
   import TodoSimpleForm from "@/components/TodoSimpleForm.vue";
@@ -107,18 +107,39 @@
       /*
        * useEffect(()=>{},[target]);
        */
-      // watchEffect(()=>{
-      //   console.log(currentPage.value);
-      //   console.log(totalCnt.value);
-      // });
+      watchEffect(()=>{
+        console.log(currentPage.value);
+        console.log(totalCnt.value);
+      });
       //reactive도 적용 가능하다
       const reactiveObj = reactive({
         num: 3,
+        another:0,
       });
       watchEffect(()=>{
-        console.log(reactiveObj.num);
+        console.log("watchEffect",reactiveObj.num);
       });
       reactiveObj.num= 2;
+
+
+      //현재 값만 감지
+      watch(currentPage,()=>{
+        console.log("watch",currentPage.value);
+      });
+      //현재값과 이전값
+      watch(currentPage,(curr,prev)=>{
+        console.log(`${prev}=>${curr}`);
+      });
+      //reactive 사용
+      watch(()=>reactiveObj.num,(curr,prev)=>{
+        console.log(`${prev}->${curr}`);
+      });
+      //여러 state 감지
+      watch(()=>[reactiveObj.num,reactiveObj.another,currentPage.value],(curr,prev)=>{
+        console.log(`num&another: ${prev}=>${curr}`);
+      });
+      reactiveObj.num= 10;
+      reactiveObj.another++;
       const getTodos = async (page)=>{
         currentPage.value = page;
         error.value='';
