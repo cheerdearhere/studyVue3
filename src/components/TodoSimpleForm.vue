@@ -3,17 +3,17 @@
 <template>
   Todo Simple Form
   <form
-      @submit.prevent="addTodoList2"
+      @submit.prevent="addTodoList"
   >
     <!--@submit.prevent: event modifier (이벤트와 관련된처리를 함)          -->
     <div class="d-flex">
       <div class="flex-grow-1 mr-2">
         <input
-            id="todo2"
+            id="todo"
             class="form-control"
             type="text"
             placeholder="new Todo"
-            v-model="todo2"
+            v-model="todo"
         />
       </div>
       <div>
@@ -39,27 +39,27 @@
       * props : super > sub
       * context : sub > super
       * */
-      let todo2=ref("");
+      let todo=ref("");
       const hasError = ref(false);
-      const addTodoList2=()=>{
+      const addTodoList=()=>{
         // e.preventDefault();//form이라 우선 막음 - @onclick.prevent로
-        if(todo2.value===""){
+        if(todo.value===""){
           hasError.value=true;
         }else{
           //super component에 데이터 전달하는 함수
           context.emit('add-todo',{
             id: Date.now(),// ms로 id사용리
-            subject:todo2.value,//내용
+            subject:todo.value,//내용
             completed:false,//완료
           });
-          todo2.value="";
+          todo.value="";
           hasError.value=false;
         }
       }
       return {
-        todo2,
+        todo,
         hasError,
-        addTodoList2,
+        addTodoList,
       }
     }
   }

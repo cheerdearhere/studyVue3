@@ -8,7 +8,7 @@
   <div class="todoContainer container">
     <h1>강의에 나온 todo list</h1>
     <input
-        id="todo2"
+        id="todo"
         class="form-control"
         type="text"
         placeholder="Search"
@@ -18,7 +18,7 @@
     <div>
 <!--  4. 전달 받기: context.emit  -->
       <TodoSimpleForm
-          @add-todo="addTodoList2"
+          @add-todo="addTodoList"
       />
       <div v-if="error" class="errorMsg">{{error}}</div>
       <div v-if="!filteredTodoList.length">
@@ -68,7 +68,7 @@
 
 <script>
   //import 영역
-  import { ref, computed } from 'vue';
+  import {ref, computed, watchEffect, reactive} from 'vue';
   import axios from "axios";
   /*1. component import*/
   import TodoSimpleForm from "@/components/TodoSimpleForm.vue";
@@ -94,29 +94,44 @@
         textDecoration: 'line-through',
         color: 'lightGray',
       }
-      let todo2=ref("");
-      const todoList2 = ref([]);
+      let todo=ref("");
+      const todoList = ref([]);
       const totalCnt = ref(0);
       const cnt = 3;
       const totalPages = computed(()=>{
         return Math.ceil(totalCnt.value/cnt);
       });
       const currentPage = ref(1);
-
       const error = ref('');
+      //useEffect update
+      /*
+       * useEffect(()=>{},[target]);
+       */
+      // watchEffect(()=>{
+      //   console.log(currentPage.value);
+      //   console.log(totalCnt.value);
+      // });
+      //reactive도 적용 가능하다
+      const reactiveObj = reactive({
+        num: 3,
+      });
+      watchEffect(()=>{
+        console.log(reactiveObj.num);
+      });
+      reactiveObj.num= 2;
       const getTodos = async (page)=>{
         currentPage.value = page;
         error.value='';
         try{
           const rs = await axios.get(`http://localhost:3000/todos?_page=${currentPage.value}&_limit=${cnt}`);//json-server에서 사용하는 페이지네이션
-          todoList2.value = rs.data;
+          todoList.value = rs.data;
           totalCnt.value = rs.headers['x-total-count'];
         }catch (err){
           error.value=`Server error: 관리자에게 문의하세요 \n ${err}`
         }
       }
       getTodos(1);//mount 실행
-      const addTodoList2 = (todo) => {
+      const addTodoList = (todo) => {
         //json-server db.json > 가상db(REST API)
         //axios를 사용해 서버로 전송 > db.json에 저장
         error.value= '';
@@ -133,13 +148,13 @@
       }
       const toggleTodo=async (idx)=>{
         error.value='';
-        const id = todoList2.value[idx].id;
+        const id = todoList.value[idx].id;
         try{
           const result = await axios.patch(`http://localhost:3000/todos/${id}`,{
-            completed: !todoList2.value[idx].completed,
+            completed: !todoList.value[idx].completed,
           });
           console.log(result);
-          alert(`${idx} 번 -완-`);
+          alert(`${todoList.value[idx].id} 번 ${todoList.value[idx].completed?"-re-":"-완-"}`);
         }catch (err){
           error.value=`Server error: 관리자에게 문의하세요 \n ${err}`;
         }finally {
@@ -148,10 +163,10 @@
       }
       const deleteTodo=(idx)=>{
         error.value='';
-        const id = todoList2.value[idx].id;
+        const id = todoList.value[idx].id;
         axios.delete(`http://localhost:3000/todos/${id}`)
           .then(rs=>{
-            todoList2.value.splice(idx,1);
+            todoList.value.splice(idx,1);
             console.log(rs);
             alert(`데이터가 삭제됨`);
           })
@@ -161,16 +176,17 @@
       const searchText = ref('');
       const filteredTodoList = computed(()=>{
         if(searchText.value){
-          return todoList2.value.filter(todo=>{
+          return todoList.value.filter(todo=>{
             return todo.subject.includes(searchText.value)
           })
         }
-        return todoList2.value
+        return todoList.value
       });
+
       //export returns
       return {
-        todo2,
-        todoList2,
+        todo,
+        todoList,
         toggle,
         hasError,
         todoStyle,
@@ -182,7 +198,7 @@
         getTodos,
         deleteTodo,
         toggleTodo,
-        addTodoList2,
+        addTodoList,
         upTrue,
         downFalse,
       }

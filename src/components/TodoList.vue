@@ -2,7 +2,7 @@
   <div
       v-for="(value,index) in todoList"
       :key="value.id"
-      class="todoList2 card mt-2"
+      class="todoList card mt-2"
   >
     <div class="card-body p-2 d-flex align-items-center">
       <div class="form-check flex-grow-1">
@@ -44,6 +44,8 @@
   </div>
 </template>
 <script>
+  import {watchEffect} from "vue";
+
   export default{
     /* array로 받을 수 있음 */
     // props:[
@@ -67,6 +69,15 @@
       'delete-todo',
     ],
     setup(props, {emit}){
+      let val  = 2;
+      watchEffect(()=>{
+        console.log("list length",props.todoList.length);
+        console.log("reactive value가 아니면 변화가 감지 안됨",val);
+      });
+      val++;
+      val++;
+
+
       // context.emit을 구조분해할당을 쓰면 더 간결
       const toggleTodo = (index)=>{
         emit('toggle-todo',index);
