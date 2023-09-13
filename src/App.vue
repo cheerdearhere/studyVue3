@@ -21,14 +21,14 @@
           @add-todo="addTodoList"
       />
       <div v-if="error" class="errorMsg">{{error}}</div>
-      <div v-if="!filteredTodoList.length">
+      <div v-if="!todoList.length">
         작성된 내역이 없습니다.
       </div>
 <!--  5. 전달 하기: props v-bind(:)로 전달
         one way binding: 부모에서 자식으로만 보낼 수 있음
 -->
       <TodoList
-        :todoList="filteredTodoList"
+        :todoList="todoList"
         :todoStyle="todoStyle"
         @delete-todo="deleteTodo"
         @toggle-todo="toggleTodo"
@@ -97,7 +97,7 @@
       let todo=ref("");
       const todoList = ref([]);
       const totalCnt = ref(0);
-      const cnt = 3;
+      const cnt = 5;
       const totalPages = computed(()=>{
         return Math.ceil(totalCnt.value/cnt);
       });
@@ -121,7 +121,6 @@
       });
       reactiveObj.num= 2;
 
-
       //현재 값만 감지
       watch(currentPage,()=>{
         console.log("watch",currentPage.value);
@@ -138,20 +137,39 @@
       watch(()=>[reactiveObj.num,reactiveObj.another,currentPage.value],(curr,prev)=>{
         console.log(`num&another: ${prev}=>${curr}`);
       });
+
       reactiveObj.num= 10;
       reactiveObj.another++;
+
+
+      const searchText = ref('');
+      // db에서하는 filtering하는 경우
+      // const filteredTodoList = computed(()=>{
+      //   if(searchText.value){
+      //     return todoList.value.filter(todo=>{
+      //       return todo.subject.includes(searchText.value)
+      //     })
+      //   }
+      //   return todoList.value
+      // });
+
       const getTodos = async (page)=>{
         currentPage.value = page;
         error.value='';
         try{
-          const rs = await axios.get(`http://localhost:3000/todos?_page=${currentPage.value}&_limit=${cnt}`);//json-server에서 사용하는 페이지네이션
+          const rs = await axios.get(`http://localhost:3000/todos?subject_like=${searchText.value}&_page=${currentPage.value}&_limit=${cnt}`);//json-server에서 사용하는 페이지네이션
           todoList.value = rs.data;
           totalCnt.value = rs.headers['x-total-count'];
         }catch (err){
           error.value=`Server error: 관리자에게 문의하세요 \n ${err}`
         }
       }
+
       getTodos(1);//mount 실행
+      // watch를 사용해 검색처리하기(client에서 필터링) 추가
+      watch(searchText,()=>{
+        getTodos(1);
+      });
       const addTodoList = (todo) => {
         //json-server db.json > 가상db(REST API)
         //axios를 사용해 서버로 전송 > db.json에 저장
@@ -193,17 +211,6 @@
           })
           .catch(err=>error.value=`Server error: 관리자에게 문의하세요 \n ${err}`);
       }
-
-      const searchText = ref('');
-      const filteredTodoList = computed(()=>{
-        if(searchText.value){
-          return todoList.value.filter(todo=>{
-            return todo.subject.includes(searchText.value)
-          })
-        }
-        return todoList.value
-      });
-
       //export returns
       return {
         todo,
@@ -212,7 +219,7 @@
         hasError,
         todoStyle,
         searchText,
-        filteredTodoList,
+        // filteredTodoList,
         error,
         totalPages,
         currentPage,
@@ -228,7 +235,6 @@
 </script>
 
 <style>
-  // stylesheet code
   body{
     width: 100%;
     height: 100%;
