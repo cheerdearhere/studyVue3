@@ -157,7 +157,7 @@
         currentPage.value = page;
         error.value='';
         try{
-          const rs = await axios.get(`http://localhost:3000/todos?subject_like=${searchText.value}&_page=${currentPage.value}&_limit=${cnt}`);//json-server에서 사용하는 페이지네이션
+          const rs = await axios.get(`http://localhost:3000/todos?_sort=id&_order=desc&subject_like=${searchText.value}&_page=${currentPage.value}&_limit=${cnt}`);//json-server에서 사용하는 페이지네이션
           todoList.value = rs.data;
           totalCnt.value = rs.headers['x-total-count'];
         }catch (err){
@@ -182,7 +182,7 @@
           console.log(rs);
           alert(`데이터가 추가됨 \n id: ${rs.data.id}/ subject: ${rs.data.subject}`);
           //context.emit(데이터이름,데이터 obj)에서 전달받은 것
-          getTodos(currentPage.value);
+          getTodos(1);
         }).catch(err=>error.value=`Server error: 관리자에게 문의하세요 \n ${err}`);
       }
       const toggleTodo=async (idx)=>{
@@ -206,8 +206,7 @@
         axios.delete(`http://localhost:3000/todos/${id}`)
           .then(rs=>{
             todoList.value.splice(idx,1);
-            console.log(rs);
-            alert(`데이터가 삭제됨`);
+            alert(`데이터가 삭제됨(${rs.status})`);
           })
           .catch(err=>error.value=`Server error: 관리자에게 문의하세요 \n ${err}`);
       }
