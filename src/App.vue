@@ -13,6 +13,7 @@
         type="text"
         placeholder="Search"
         v-model="searchText"
+        @keyup.enter = "searchTodo"
     />
 <!--  3. 태그입력  -->
     <div>
@@ -164,12 +165,20 @@
           error.value=`Server error: 관리자에게 문의하세요 \n ${err}`
         }
       }
-
       getTodos(1);//mount 실행
       // watch를 사용해 검색처리하기(client에서 필터링) 추가
+      let timeOut = null;
       watch(searchText,()=>{
-        getTodos(1);
+        clearTimeout(timeOut);//이전 interval 제거
+        timeOut = setTimeout(()=>{//검색 주기 지정
+          getTodos(1);
+        },1000);
       });
+      const searchTodo =()=>{//enterkey 연결
+        clearTimeout(timeOut);
+        getTodos(1);
+      }
+
       const addTodoList = (todo) => {
         //json-server db.json > 가상db(REST API)
         //axios를 사용해 서버로 전송 > db.json에 저장
@@ -225,6 +234,7 @@
         getTodos,
         deleteTodo,
         toggleTodo,
+        searchTodo,
         addTodoList,
         upTrue,
         downFalse,
