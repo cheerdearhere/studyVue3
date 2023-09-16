@@ -1,5 +1,6 @@
 <!--  최상위 컴포넌트  -->
 <template>
+  <router-view/>
   <UseRef/>
   <div class="computed">
     <ComputedCount/>
