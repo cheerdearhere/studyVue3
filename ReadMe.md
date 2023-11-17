@@ -538,7 +538,10 @@ context.emit("이벤트 이름",전달할 변수);
 ```vue
 <script>
   export default{
-    emits:['add-todo'],
+    emits:[
+        //vue 3.0부터는 필수
+        'add-todo', 
+    ],
     setup(props,context){
       let todo2=ref("");
       const hasError = ref(false);
