@@ -146,7 +146,7 @@ vue.js 2.0에서는 [options API](https://ko.vuejs.org/guide/introduction.html#s
 해당 component에서 동적으로 사용할 내용이 들어감
 ```vue
     <script>
-        import {component} from "root"; //라이브러리/모듈 연결 
+        import {component} from "root"; //라이브러리/모듈/컴포넌트 연결 
         export default{ //컴포넌트에서 사용할 대상들 적음
             props:{
                 // super로부터 전달받을 데이터 형식
@@ -154,6 +154,9 @@ vue.js 2.0에서는 [options API](https://ko.vuejs.org/guide/introduction.html#s
             emits:[
                 //부모로 전달할 대상
             ],
+            components:{
+                //컴포넌트들 
+            },
             setup(props,{emit}){
                 //script가 직접 사용되는 곳
                 
@@ -185,7 +188,7 @@ bootstrap을 사용하는 경우
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 ```
 
-## B. v-**
+## B. 디렉티브: v-**
 ### 1. event
 event 삽입은 on{Event}가 아닌 v-on:{event}="function"의 형태로 사용
 ```vue
@@ -381,12 +384,409 @@ ref에서도 Collection을 쓸수 있으나 script내에서 값을 꺼낼 때 �
     }
 </script>
 ```
-### 4. 축약표시
-| 원형                    | 약어               |
-|-----------------------|------------------|
-| v-on:이벤트="함수이름"       | @event="함수이름"    |
-| v-bind:대상타입="변수이름"    | :대상타입="변수이름"     |
-|v-model||
+#### c. checkbox 데이터 바인딩
+```vue
+    <div class="form-check">
+        <input class="form-check-input" 
+               type="checkbox" 
+               v-model="value.completed"
+        />
+<!--   boolean data로 바인딩 -->
+        <label class="form-check-label">
+            <h5 class="todoLabel">
+                {{index+1}}. {{value.subject}}
+            </h5>
+        </label>
+    </div>
+```
+### 4. v-for="(element,index,array) in Collection객체"
+map과 매개변수 배치가 유사함
+```vue
+<template>
+  <!--   v-for: 반복문 처리   -->
+  <div
+      v-for="(value,index) in todoList2"
+      :key="value.id"
+      class="todoList2 card mt-2"
+  >
+    <div class="card-body p-2">
+      <h5>{{index+1}}. {{value.subject}}</h5>
+    </div>
+  </div>
+</template>
+```
+### 5. v-show, v-if
+둘은 같은 기능을 하지만 초기 랜더 비용과 중간 토글 비용에 차이가 있으므로 성능을 고려해 사용
+
+#### a. v-if="조건문", v-else-if="조건문", v-else
+v-if/else-if/else는 토글 비용이 크기때문에 자주 바뀌지 않는 경우에 사용
+ex) 권한에 따른 정보 표시, mode 선택 변화 등
+```vue
+<template>
+  <div class="if">
+    <div v-if="조건1">if:true</div>
+    <div v-else-if="조건2">else-if</div>
+    <div v-else>else:false</div>
+  </div>
+</template>
+```
+#### b. v-show="조건"
+v-show는 랜더링 비용이 크기때문에 자주 바뀌는 경우에 사용
+ex) client의 input에 반응, 입력값 에러인경우 문자표시
+```vue
+<template>
+  <div class="show">
+    <div v-show="조건1">true</div>
+    <div v-show="조건2">false</div>
+        ...
+  </div>
+  <div class="errorMsg" v-show="hasError">Error: This field cannot be empty!</div>
+</template>
+<script>
+  import { ref } from "vue";
+  export default {
+    setup(){
+        const hasError = ref(false);
+        const validate = e => {
+            // validation
+            if(error) hasError.value = true;
+        }
+        
+        return {
+            hasError,
+            validate,
+        }
+    }
+}
+</script>
+```
+
+### etc. 축약표시
+| 원형                               | 약어               |
+|----------------------------------|------------------|
+| v-on:이벤트="함수이름"                  | @event="함수이름"    |
+| v-bind:대상타입="변수이름"               | :대상타입="변수이름"     |
+| v-model                          ||
+| v-for="(값,index,array) in 컬랙션이름" ||
+| v-if="조건" v-if-else="조건" v-else  ||
+| v-show="조건"                      ||
+
+## C. parent - child 사이의 통신
+### 1. 컴포넌트 분리해서 연결하기
+#### a. 컴포넌트를 분리해 다른 파일로 작성
+#### b. script: 분리된 컴포넌트 연결하기
+script태그에 import 
+```vue
+<script>
+//  import
+  import TodoSimpleForm from "@/components/TodoSimpleForm.vue";
+  import TodoList from "@/components/TodoList.vue";
+  export default {
+//  component 처리
+        components:{
+          TodoSimpleForm,
+          TodoList,
+        },
+        setup() {
+            ...
+        }
+    }
+</script>
+```
+#### c. JSX 입력
+```vue
+<template>
+    <TodoSimpleForm/>
+    <TodoList/>
+</template>
+```
+#### d. 분리한 child component에 데이터, 함수 등 옮기기
+```vue
+<script>
+  export default{
+    setup(){
+      let todo2=ref("");
+      const hasError = ref(false);
+      const addTodoList2=()=>{
+        if(todo2.value===""){
+          hasError.value=true;
+        }else{
+          todo2.value.push({
+            id: Date.now(),// ms로 id사용리
+            subject:todo2.value,//내용
+            completed:false,//완료
+          });
+          todo2.value="";
+          hasError.value=false;
+        }
+      }
+      return {
+        todo2,
+        hasError,
+        addTodoList2,
+      }
+    }
+  }
+</script>
+```
+데이터의 위치가 달라지므로 super - sub 사이의 통신을 위해 설정.
+### 2. Parent component와 Child component의 통신
+      * props : super > sub
+      * context : sub > super
+#### a. child > parent: context
+context.emit("이벤트 이름",전달할 변수);
+```vue
+<script>
+  export default{
+    emits:['add-todo'],
+    setup(props,context){
+      let todo2=ref("");
+      const hasError = ref(false);
+      const addTodoList=()=>{
+        if(todo2.value===""){
+          hasError.value=true;
+        }else{
+          // emit: super component에 데이터 전달하는 method
+          context.emit('add-todo',{
+            id: Date.now(),// ms로 id사용리
+            subject:todo2.value,//내용
+            completed:false,//완료
+          });
+          todo2.value="";
+          hasError.value=false;
+        }
+      }
+      return {
+        todo2,
+        hasError,
+        addTodoList,
+      }
+    }
+  }
+</script>
+```
+context.emit()으로 설정한 이벤트를 감지하도록 parent template에 연결
+
+v-on:설정한이벤트 = "연결할 콜백"
+```vue
+<template>
+  <TodoSimpleForm
+      @add-todo="addTodoList"
+  />
+</template>
+```
+전달한 데이터를 param으로 call back funciton에 전달
+```vue
+<script>
+import TodoSimpleForm from "./src/components/TodoSimpleForm.vue";
+import { ref } from "vue";
+export default {
+    components: {
+      TodoSimpleForm,
+    },
+    setup(){
+        //...
+        let todoList = ref([]);
+        const addTodoList = (parameter)=>{
+            todoList.value.push(parameter);
+        }       
+        return {
+            todoList,
+            addTodoList,
+        }
+    }
+}
+</script>
+```
+
+#### b. parent > child : props
+부모 컴포넌트에서 전달할 대상을 입력
+
+변수는 bind, 함수는 on으로 처리
+```vue
+    <TodoList
+        v-bind:todoList="todoList2" 
+        :todoStyle="todoStyle"
+        v-on:delete-todo="deleteTodo"
+        @toggle-todo="toggleTodo"
+    />
+```
+받는 컴포넌트(child)에서 props 관리
+```vue
+<script>
+  export default{
+    // props:[
+    //     'todoList',
+    //     'todoStyle',
+    // ],
+    /* 타입과 필수 여부를 지정할 수 있음 */
+    props:{
+      todoList: {
+        //Type: Array,Object,String,Number,Boolean,Function,Promise
+        type     : Array,
+        required : true,
+      },
+      todoStyle:{
+        type     : Object,
+        required : true,
+      },
+    },
+    setup(props, context){
+      const todosLength=()=>{
+        console.log("list length",props.todoList.length);
+      };
+      return{
+        todosLength
+      }
+    }
+  }
+</script>
+```
+* props 사용시 [주의사항](https://vuejs.org/guide/components/props.html)
+
+props는 부모에서 자식으로 보내는 단방향 전송임. 
+
+부모의 변경사항이 자식컴포넌트에 영향을 주지만 자식 컴포넌트의 변경이 부모로 전달되지 않음. 
+
+필요하다면 context 이용
+```vue
+<script>
+export default {
+  props:{
+    todoList: {
+      type     : Array,
+      required : true,
+    },
+    todoStyle:{
+      type     : Object,
+      required : true,
+    },
+  },
+  emits:[
+    'toggle-todo',
+    'delete-todo',
+  ],
+  setup(props, {emit}){
+    // context.emit을 구조 분해 할당해 사용하면 더 간결
+    const toggleTodo = (index)=>{
+      emit('toggle-todo',index);
+    }
+    const deleteTodo = (index)=>{
+      emit('delete-todo',index)
+    }
+    return{
+      toggleTodo,
+      deleteTodo,
+    }
+  }
+}
+</script>
+```
+
+#### c. computed와 watch
 
 
+## D. Router 처리
 
+# III. 기타 기능
+## A. form으로 데이터 받기
+```vue
+<template>
+    <div>
+        <form
+            class="d-flex"
+            @submit.prevent="addTodoList2"
+        >
+<!--      onSubmit에서 preventDefault() 처리 > form의 자동 reload를 막음   -->
+            <div class="flex-grow-1 mr-2">
+                <input
+                    id="todo2"
+                    class="form-control"
+                    type="text"
+                    placeholder="new Todo"
+                    v-model="todo2"
+                />
+            </div>
+            <button
+                class="btn btn-sm btn-outline-dark"
+                type="submit"
+            >
+                Add todo list
+            </button>
+        </form>
+    </div>
+</template>
+<script>
+export default {
+    setup(){
+        let todo2=ref("");
+        const todoList2 = ref([]);
+        const addTodoList2=()=>{
+            // e.preventDefault();대신 .prevent사용
+            todoList2.value.push({
+                id: Date.now(),// ms로 id사용
+                subject:todo2.value,//내용
+            });
+            todo2.value="";
+        }
+        return {
+            todo2,
+            todoList2,
+            addTodoList2,
+        }
+    } 
+}
+</script>
+```
+## B. check되면 css까지 변경
+```vue
+<template>
+  <div
+      v-for="(value,index) in todoList2"
+      :key="value.id"
+      class="todoList2 card mt-2"
+  >
+    <div class="card-body p-2">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" v-model="value.completed"/>
+        <label class="form-check-label">
+          <!--      css 바인딩 : object -->
+          <h5
+              class="todoLabel"
+              :style="value.completed ? todoStyle:{}"
+          >
+            <!--      css 바인딩 : class 사용  -->
+            <h5
+                class="todoLabel"
+                :class="{completedTodo: value.completed }"
+            >
+            {{index+1}}. {{value.subject}}
+          </h5>
+        </label>
+      </div>
+    </div>
+  </div>  
+</template>
+<script>
+export default {
+    setup(){
+  //      ...
+      const todoStyle  = {//jsx문법때처럼 -이 아닌 camelCase로 지정
+        textDecoration: 'line-through',
+        color: 'lightGray',
+      }
+      return {
+//            ...
+          todoStyle,
+      }
+    }
+}
+</script>
+<style>
+  .completedTodo{
+    text-decoration: line-through;
+    color:lightgray;
+  }
+</style>
+```
+## C. 
