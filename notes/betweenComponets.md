@@ -212,5 +212,3 @@ export default {
 }
 </script>
 ```
-
-#### c. computed와 watch

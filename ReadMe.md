@@ -90,7 +90,9 @@ vue.js 2.0에서는 [options API](https://ko.vuejs.org/guide/introduction.html#s
 [문서로 이동](notes/directiveCodes.md)
 ## C. parent - child 사이의 통신
 [문서로 이동](notes/betweenComponets.md)
-## D. Router 처리
+## D. manage states: Computed Properties And Watch
+[문서로 이동](notes/manageStates.md)
+## E. Router 처리
 
 # III. 기타 기능
 [문서로 이동](notes/examples.md)
