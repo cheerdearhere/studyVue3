@@ -81,6 +81,9 @@ GET /todos?_sort=id&_order=desc&subject_like=&_page=1&_limit=5 200 31.250 ms - 3
         error.value=`Server error: 관리자에게 문의하세요 \n ${err}`
     }
 ```
+## B. 비동기, 동기
+[dreamCoding 강의](https://www.youtube.com/watch?v=JB_yU6Oe2eE)
+[정리한 문서 이동](notes/Synchronous_Asynchronous.md)
 
 # II. Vue 3.0: [composition API](https://ko.vuejs.org/guide/introduction.html#single-file-components)
 vue.js 2.0에서는 [options API](https://ko.vuejs.org/guide/introduction.html#single-file-components)가 사용됨
