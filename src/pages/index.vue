@@ -1,12 +1,25 @@
-<script setup>
-
-</script>
-
 <template>
-    <h1>Home</h1>
-
+  <h1>Home Page</h1>
+  <UseRef/>
 </template>
 
-<style scoped>
+<script>
+import UseRef from "@/components/UseRef.vue";
+export default {
+  components:{
+    UseRef
+  }
+}
+</script>
 
+<style>
+body{
+  width: 100%;
+  height: 100%;
+  margin: 5%;
+}
+div{
+  background: #fff;
+  color:#000;
+}
 </style>

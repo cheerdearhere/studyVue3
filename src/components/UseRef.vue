@@ -112,11 +112,11 @@
     <ul class="todoList"></ul>
   </div>
   <div class="show">
-    <div v-show="toggle">true</div>
-    <div v-show="!toggle">false</div>
+    <div v-show="toggleFlag">true</div>
+    <div v-show="!toggleFlag">false</div>
   </div>
   <div class="if">
-    <div v-if="toggle">if:true</div>
+    <div v-if="toggleFlag">if:true</div>
     <!--    <div v-else-if="조건">else-if</div>-->
     <div v-else>else:false</div>
   </div>
@@ -134,16 +134,16 @@ export default {
     const searchText = ref('');
     const filteredTodoList = computed(()=>{
       if(searchText.value){
-        return todoList.value.filter(todo=>{
-          return todo.subject.includes(searchText.value)
+        return todoList.filter(todo=>{
+          return todo?.subject.includes(searchText.value)
         })
       }
-      return todoList.value;
+      return todoList;
     });
     // variables
     const name = 'Ik Cho';//변수를 지정
     let afterClick = ref("no...I'm waiting");
-    let toggleFlag =false;
+    let toggleFlag =ref(false);
     const userData = reactive({
       id:"1",
       name:"김",
@@ -193,18 +193,24 @@ export default {
       return `I'm ${age} years old.`
     }
     const listeningFunction = ()=>{
-      toggleFlag = !toggleFlag;
+      toggleFlag.value = !toggleFlag.value;
       //ref에 저정된 값을 변경시킴
-      afterClick.value = toggleFlag ? "Yes!" : "no...I'm waiting";//그냥 변수만 변경되고 화면은 변경안됨
+      afterClick.value = toggleFlag.value ? "Yes!" : "no...I'm waiting";//그냥 변수만 변경되고 화면은 변경안됨
       //단 tag에서 쓰는 경우에는 .value를 안써도 됨
-      toggleType.value = toggleFlag ? "text" : "number";//type도 바인드 가능
-      toggleClass.value = toggleFlag ? "redName" : "blueName";
+      toggleType.value = toggleFlag.value ? "text" : "number";//type도 바인드 가능
+      toggleClass.value = toggleFlag.value ? "redName" : "blueName";
     }
     const changeUserData = ()=>{
-      toggleFlag = !toggleFlag;
-      userData.id     = toggleFlag ? "2" : "1";
-      userData.name   = toggleFlag ? "홍" : "김";
-      userData.phone  = toggleFlag ? "00100" : "009";
+      toggleFlag.value = !toggleFlag.value;
+      userData.id     = toggleFlag.value ? "2" : "1";
+      userData.name   = toggleFlag.value ? "홍" : "김";
+      userData.phone  = toggleFlag.value ? "00100" : "009";
+    }
+    const upTrue = ()=>{
+      toggleFlag.value = true;
+    }
+    const downFalse = ()=>{
+      toggleFlag.value = false;
     }
 
     //export returns
@@ -214,6 +220,7 @@ export default {
       userData,
       toggleType,
       toggleClass,
+      toggleFlag,
       mvData,
       todo,
       todoList,
@@ -227,6 +234,8 @@ export default {
       changeUserData,
       onSubmit,
       updateMVdata,
+      upTrue,
+      downFalse,
     }
   }
 }
@@ -259,12 +268,6 @@ div{
 }
 .label{
   display:inline-block;
-}
-.redName {
-  color:red;
-}
-.blueName {
-  background-color:blue;
 }
 .inSquare{
   height:50px;
