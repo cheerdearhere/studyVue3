@@ -81,8 +81,51 @@ GET /todos?_sort=id&_order=desc&subject_like=&_page=1&_limit=5 200 31.250 ms - 3
         error.value=`Server error: 관리자에게 문의하세요 \n ${err}`
     }
 ```
+#### e. json-server 설정하기
+CLI에서 옵션을 선택해 사용가능
+```dockerfile
+json-server [options] <source>
+ex)
+json-server --watch db.json --port 3004
+
+Options:
+  --config, -c       Path to config file           [default: "json-server.json"]
+  --port, -p         Set port                                    [default: 3000]
+  --host, -H         Set host                             [default: "localhost"]
+  --watch, -w        Watch file(s)                                     [boolean]
+  --routes, -r       Path to routes file
+  --middlewares, -m  Paths to middleware files                           [array]
+  --static, -s       Set static files directory
+  --read-only, --ro  Allow only GET requests                           [boolean]
+  --no-cors, --nc    Disable Cross-Origin Resource Sharing             [boolean]
+  --no-gzip, --ng    Disable GZIP Content-Encoding                     [boolean]
+  --snapshots, -S    Set snapshots directory                      [default: "."]
+  --delay, -d        Add delay to responses (ms)
+  --id, -i           Set database id property (e.g. _id)         [default: "id"]
+  --foreignKeySuffix, --fks  Set foreign key suffix, (e.g. _id as in post_id)
+                                                                 [default: "Id"]
+  --quiet, -q        Suppress log messages from output                 [boolean]
+  --help, -h         Show help                                         [boolean]
+  --version, -v      Show version number                               [boolean]
+
+Examples:
+  json-server db.json
+  json-server file.js
+  json-server http://example.com/db.json
+
+https://github.com/typicode/json-server
+```
+json-server.json(설정 파일)
+```json5
+{
+//  "대상 옵션" : "내용"
+  "port"  : 3000,
+  "watch" : true,
+}
+```
 ## B. 비동기, 동기
-[dreamCoding 강의](https://www.youtube.com/watch?v=JB_yU6Oe2eE)
+[youTube : dreamCoding 강의](https://www.youtube.com/watch?v=JB_yU6Oe2eE)
+
 [정리한 문서 이동](notes/Synchronous_Asynchronous.md)
 
 # II. Vue 3.0: [composition API](https://ko.vuejs.org/guide/introduction.html#single-file-components)
@@ -96,6 +139,6 @@ vue.js 2.0에서는 [options API](https://ko.vuejs.org/guide/introduction.html#s
 ## D. manage states: Computed Properties And Watch
 [문서로 이동](notes/manageStates.md)
 ## E. Router 처리
-
+[문서로 이동](notes/router.md)
 # III. 기타 기능
 [문서로 이동](notes/examples.md)
