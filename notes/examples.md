@@ -204,4 +204,91 @@ export default {
   }
 </script>
 ```
-### 3. 공용 component 관련 로직 추출
+### 3. 공용 component 관련 로직 추출(Composition api로 사용하기)
+#### a. 여러곳에서 중복으로 사용되는 code를 모을 directory
+보통 composables 또는 hooks라고 지음
+#### b. 내부에 js로 파일 생성
+```javascript
+import {onBeforeUnmount, ref} from "vue";
+
+export const useToast= () =>{
+    // Toast
+    const showToast = ref(false);
+    const toastMessage = ref("");
+    const toastResStatus = ref(false);
+    const timeOut = ref(null);
+    
+    const resetToast = ()=>{
+        toastMessage.value="";
+        toastResStatus.value=false;
+    }
+    
+    const triggerToast =(message,status)=>{
+        toastMessage.value=message;
+        toastResStatus.value=status;
+        showToast.value = true;
+        //5초뒤 리셋
+        timeOut.value = setTimeout(()=>{
+            showToast.value = false;
+            resetToast();
+        },3000);
+    }
+    onBeforeUnmount(()=>{
+        clearTimeout(timeOut);
+    });
+    return {
+        toastMessage,
+        toastResStatus,
+        showToast,
+        triggerToast,
+    }
+}
+```
+#### c. 사용할 곳에서 연결
+```vue
+<template>
+  <Toast
+      v-show="showToast"
+      :message="toastMessage"
+      :status="toastResStatus"
+  />
+</template>
+<script>
+  import {useToast} from "@/composables/toast";
+  import Toast from "@/Toast.vue";
+
+  export default {
+    components: {
+      Toast,
+    },
+    setup() {
+      // toast
+      const {
+        toastMessage,
+        toastResStatus,
+        showToast,
+        triggerToast,
+      } = useToast();
+      // 사용 하기
+      const getTodos = async (page)=>{
+        currentPage.value = page;
+        error.value='';
+        try{
+          const rs = await axios.get(`${host}?_sort=id&_order=desc&subject_like=${searchText.value}&_page=${currentPage.value}&_limit=${cnt}`);//json-server에서 사용하는 페이지네이션
+          todoList.value = rs.data;
+          totalCnt.value = rs.headers['x-total-count'];
+        }catch (error){
+          triggerToast(`${error.name}: ${error.message} (code: ${error.code})`);
+        }
+      }
+      getTodos(1);//mount 실행
+      return {
+        // toast
+        showToast,
+        toastMessage,
+        toastResStatus,
+      }
+    }
+  }
+</script>
+```
