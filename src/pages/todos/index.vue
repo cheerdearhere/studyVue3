@@ -72,6 +72,7 @@ import ComputedCount from "@/components/ComputedCount.vue";
 import UseRef from "@/components/UseRef.vue";
 import {computed, reactive, ref, watch, watchEffect} from "vue";
 import axios from "axios";
+import {host} from "@/router";
 
 export default {
   components:{
@@ -152,7 +153,7 @@ export default {
       currentPage.value = page;
       error.value='';
       try{
-        const rs = await axios.get(`http://localhost:3000/todos?_sort=id&_order=desc&subject_like=${searchText.value}&_page=${currentPage.value}&_limit=${cnt}`);//json-server에서 사용하는 페이지네이션
+        const rs = await axios.get(`${host}?_sort=id&_order=desc&subject_like=${searchText.value}&_page=${currentPage.value}&_limit=${cnt}`);//json-server에서 사용하는 페이지네이션
         todoList.value = rs.data;
         totalCnt.value = rs.headers['x-total-count'];
       }catch (err){
@@ -178,7 +179,7 @@ export default {
       //axios를 사용해 서버로 전송 > db.json에 저장
       error.value= '';
       //서버(지금은 임시)로 전달
-      axios.post('http://localhost:3000/todos',{
+      axios.post(host,{
         subject: todo.subject,
         completed: todo.completed,
       }).then(rs=>{
@@ -192,7 +193,7 @@ export default {
       error.value='';
       const id = todoList.value[idx].id;
       try{
-        const result = await axios.patch(`http://localhost:3000/todos/${id}`,{
+        const result = await axios.patch(`${host}/${id}`,{
           completed: checked,//!todoList.value[idx].completed
         });
         console.log(result);
@@ -206,7 +207,7 @@ export default {
     const deleteTodo=(idx)=>{
       error.value='';
       const id = todoList.value[idx].id;
-      axios.delete(`http://localhost:3000/todos/${id}`)
+      axios.delete(`${host}/${id}`)
           .then(rs=>{
             todoList.value.splice(idx,1);
             alert(`데이터가 삭제됨(${rs.status})`);

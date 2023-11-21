@@ -27,6 +27,7 @@
 import {useRoute, useRouter} from "vue-router";
 import axios from "axios";
 import {ref} from "vue";
+import {host} from "@/router";
 
 const route = useRoute();
 const router = useRouter();
@@ -35,7 +36,7 @@ const todo = ref(null);
 const loading = ref(true);//loading처리
 
 const getTodo = async ()=>{
-  const res = await axios.get(`http://localhost:3000/todos/${route.params.id}`);
+  const res = await axios.get(`${host}/${route.params.id}`);
   if(res.status !== 200) throw Error("Not found");
   todo.value = res.data;
   loading.value = false; //완료 후 loading flag 처리

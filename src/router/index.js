@@ -4,6 +4,8 @@ import Todo from "@/pages/todos/_id.vue";
 import Home from "@/pages/index.vue"
 import ComputedCount from "@/pages/count/index.vue";
 
+const host = "http://localhost:3000/todos";
+
 const router = createRouter({
     history:createWebHistory(),//manage web history
     routes:[
@@ -30,3 +32,6 @@ const router = createRouter({
     ],
 });
 export default router;
+export {
+    host,
+}
