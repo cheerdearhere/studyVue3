@@ -64,10 +64,6 @@ const router = useRouter();
 const todo = ref(null);
 const originTodo = ref(null);
 const loading = ref(true);//loading처리
-// const showToast = ref(false);
-// const toastMessage = ref("");
-// const toastResStatus = ref(false);
-// const timeout = ref(null);
 const {
   toastMessage,
   toastResStatus,
@@ -111,20 +107,6 @@ const isTodoUpdated = computed(() =>{
   return check;
 });
 
-// const resetToast = ()=>{
-//   toastMessage.value="";
-//   toastResStatus.value=false;
-// }
-// const triggerToast =(message,status)=>{
-//   toastMessage.value=message;
-//   toastResStatus.value=status;
-//   showToast.value = true;
-//   //5초뒤 리셋
-//   timeout.value = setTimeout(()=>{
-//     showToast.value = false;
-//     resetToast();
-//   },3000);
-// }
 const onSave = async () =>{
   const updateData = todo.value;
   try{
@@ -143,10 +125,6 @@ const onSave = async () =>{
 }
 onBeforeMount(()=>{
   getTodo();
-});
-onUnmounted(()=>{
-// setTimeOut, interval 등 메모리를 오래 사용하는 경우 unMount처리할때 닫아주면 성능향상에 도움이 된다.
-//   clearTimeout(timeout.value);
 });
 </script>
 

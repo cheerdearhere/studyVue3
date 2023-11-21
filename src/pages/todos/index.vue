@@ -155,16 +155,6 @@ export default {
     reactiveObj.another++;
 
     const searchText = ref('');
-    // db에서하는 filtering하는 경우
-    // const filteredTodoList = computed(()=>{
-    //   if(searchText.value){
-    //     return todoList.value.filter(todo=>{
-    //       return todo.subject.includes(searchText.value)
-    //     })
-    //   }
-    //   return todoList.value
-    // });
-
     const getTodos = async (page)=>{
       currentPage.value = page;
       error.value='';
