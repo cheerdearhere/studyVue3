@@ -140,5 +140,62 @@ vue.js 2.0에서는 [options API](https://ko.vuejs.org/guide/introduction.html#s
 [문서로 이동](notes/manageStates.md)
 ## E. Router 처리
 [문서로 이동](notes/router.md)
+
 # III. 기타 기능
 [문서로 이동](notes/examples.md)
+
+# IV. 유용한 Library
+## A. [Lodash](https://lodash.com/)
+객체, json 문자열을 비교할때 유용. 
+### 1. 라이브러리 설치
+#### a. CDN
+```html
+<!-- Lodash CDN -->
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+```
+#### b. npm 사용
+```dockerfile
+    npm i lodash
+```
+### 2. 사용 예시
+```javascript
+    _.사용할함수(비교대상);
+```
+
+```vue
+
+<template>
+  <button
+      :class="!isTodoUpdated?'':'disabled'"
+      :disabled="!isTodoUpdated"
+  >
+    내용이 달라져야 활성화
+  </button>
+</template>
+<script>
+  import {computed} from "vue";
+  import _ from "lodash";
+
+  export default {
+    setup() {
+    ...
+      const isTodoUpdated = computed(() => {
+        return !_.isEqual(todo.value, originTodo.value);
+      });
+      const onSave = async () =>{
+        const updateData = todo.value;
+        const res = await axios.put(`${host}/${id}`,{ ...updateData });
+        if(res.status !== 200) throw new Error("server Error: failed save");
+        originTodo.value = {...res.data}; //저장 후 비교대상 update
+        alert("success: update data");
+      }
+    ...
+      return {
+        isTodoUpdated,
+        onSave,
+      }
+    }
+  }
+
+</script>
+```
