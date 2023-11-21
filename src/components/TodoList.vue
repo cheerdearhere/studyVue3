@@ -4,14 +4,18 @@
       :key="value.id"
       class="todoList card mt-2"
   >
-    <div class="card-body p-2 d-flex align-items-center">
+    <div
+        class="card-body p-2 d-flex align-items-center"
+        @click="moveToPage(value.id)"
+    >
       <div class="form-check flex-grow-1">
         &emsp;
         <input
           class="form-check-input"
           type="checkbox"
           :checked="value.completed"
-          @change="toggleTodo(index)"
+          @change="toggleTodo(index, $event)"
+          @click.stop
         />
         <!-- v-model="value.completed"
         : 단방향 전달인 props에서 양방향 처리인 v-model을 사용하는 것은 적절하지 않음
@@ -35,7 +39,7 @@
       <div>
         <button
             class="btn btn-outline-danger btn-sm"
-            @click="deleteTodo(index)"
+            @click.stop="deleteTodo(index)"
         >
           Delete
         </button>
@@ -45,6 +49,7 @@
 </template>
 <script>
   import {watchEffect} from "vue";
+  import {useRouter} from "vue-router";
 
   export default{
     /* array로 받을 수 있음 */
@@ -79,15 +84,26 @@
 
 
       // context.emit을 구조분해할당을 쓰면 더 간결
-      const toggleTodo = (index)=>{
-        emit('toggle-todo',index);
+      const toggleTodo = (index, event)=>{
+        emit('toggle-todo',index, event.target.checked);
       }
       const deleteTodo = (index)=>{
         emit('delete-todo',index)
       }
+      const router = useRouter();
+      const moveToPage = (id)=>{
+        // router.push(`/todos/${id}`);
+        router.push({
+          name:'Todo',
+          params: {
+            id: id,
+          }
+        })
+      }
       return{
         toggleTodo,
         deleteTodo,
+        moveToPage,
       }
     }
   }

@@ -188,15 +188,15 @@ export default {
         getTodos(1);
       }).catch(err=>error.value=`Server error: 관리자에게 문의하세요 \n ${err}`);
     }
-    const toggleTodo=async (idx)=>{
+    const toggleTodo=async (idx, checked)=>{
       error.value='';
       const id = todoList.value[idx].id;
       try{
         const result = await axios.patch(`http://localhost:3000/todos/${id}`,{
-          completed: !todoList.value[idx].completed,
+          completed: checked,//!todoList.value[idx].completed
         });
         console.log(result);
-        alert(`${todoList.value[idx].id} 번 ${todoList.value[idx].completed?"-re-":"-완-"}`);
+        alert(`${todoList.value[idx].id} 번 ${!checked?"-re-":"-완-"}`);
       }catch (err){
         error.value=`Server error: 관리자에게 문의하세요 \n ${err}`;
       }finally {
