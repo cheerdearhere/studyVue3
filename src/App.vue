@@ -1,10 +1,16 @@
 <!--  최상위 컴포넌트  -->
 <template>
+  <Navbar/>
   <router-view/>
-  <UseRef/>
 </template>
+
 <script>
+import Navbar from "@/components/Navbar.vue";
+
 export default{
+  components:{
+    Navbar
+  },
   setup(){
     return {
 
