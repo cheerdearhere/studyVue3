@@ -100,4 +100,108 @@ export default {
   }
 </style>
 ```
-## C. 
+## C. toast 컴포넌트 만들기
+### 1. Toast용 component 생성
+```vue
+<template>
+  <div
+      class="alert toast-box"
+      :class="status ? 'alert-success' : 'alert-danger'"
+      role="alert"
+  >
+    {{ message }}
+  </div>
+
+</template>
+<script>
+export default {
+  props:{
+    message: {
+      type: String,
+      required: true,
+    },
+    status: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  setup(){
+
+    return {
+
+    }
+  }
+}
+</script>
+
+<style>
+  .toast-box{
+    position: fixed;
+    z-index: 1000;
+    top: 10px;
+    right: 10px;
+  }
+</style>
+```
+
+### 2. 사용할 페이지 연겷
+```vue
+<template>
+  <Toast
+      v-show="showToast"
+      :message="toastMessage"
+      :status="toastResStatus"
+  />
+</template>
+<script>
+  import Toast from "@/components/Toast.vue";
+  import {reactive} from "vue";
+
+  export default {
+    components: {
+      Toast,
+    },
+    setup() {
+      const showToast = ref(false);
+      const toastMessage = ref("");
+      const toastResStatus = ref(false);
+
+      const resetToast = ()=>{
+        toastMessage.value="";
+        toastResStatus.value=false;
+      }
+      
+      const triggerToast =(message,status)=>{
+        toastMessage.value=message;
+        toastResStatus.value=status;
+        showToast.value = true;
+        //5초뒤 리셋
+        setTimeout(()=>{
+          showToast.value = false;
+          resetToast();
+        },5000);
+      }
+
+      const onSave = async () => {
+        const updateData = todo.value;
+        const res = await axios.put(`${host}/${id}`, {...updateData});
+        const {status, statusText} = res;
+        if (status !== 200) {//throw new Error("server Error: failed save");
+          triggerToast(`Error : ${statusText} (code: ${status})`, false);
+        } else {
+          triggerToast(`Success : Saved Todo`, true);
+          originTodo.value = {...res.data};
+        }
+      }
+      
+      return {
+        showToast,
+        toastMessage,
+        toastResStatus,
+        onSave,
+      }
+    }
+  }
+</script>
+```
+### 3. 공용 component 관련 로직 추출
