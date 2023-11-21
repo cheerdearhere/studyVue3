@@ -62,6 +62,11 @@
     </div>
     <div class="footer"></div>
   </div>
+  <Toast
+      v-show="showToast"
+      :message="toastMessage"
+      :status="toastResStatus"
+  />
 </template>
 
 <script>
@@ -70,9 +75,11 @@ import TodoList from "@/components/TodoList.vue";
 import TodoSimpleForm from "@/components/TodoSimpleForm.vue";
 import ComputedCount from "@/components/ComputedCount.vue";
 import UseRef from "@/components/UseRef.vue";
-import {computed, reactive, ref, watch, watchEffect} from "vue";
+import {computed, onBeforeUnmount, reactive, ref, watch, watchEffect} from "vue";
 import axios from "axios";
 import {host} from "@/router";
+import Toast from "@/components/Toast.vue";
+import {useToast} from "@/composables/toast";
 
 export default {
   components:{
@@ -80,8 +87,17 @@ export default {
     TodoSimpleForm,
     TodoList,
     UseRef,
+    Toast,
   },
-  setup(){//mount 할 때
+  setup(){
+    // toast
+    const {
+      toastMessage,
+      toastResStatus,
+      showToast,
+      triggerToast,
+    } = useToast();
+
     /* 강의의 내용을 적용 */
     const hasError = ref(false);
     const toggle=ref(true);
@@ -156,21 +172,21 @@ export default {
         const rs = await axios.get(`${host}?_sort=id&_order=desc&subject_like=${searchText.value}&_page=${currentPage.value}&_limit=${cnt}`);//json-server에서 사용하는 페이지네이션
         todoList.value = rs.data;
         totalCnt.value = rs.headers['x-total-count'];
-      }catch (err){
-        error.value=`Server error: 관리자에게 문의하세요 \n ${err}`
+      }catch (error){
+        triggerToast(`${error.name}: ${error.message} (code: ${error.code})`);
       }
     }
     getTodos(1);//mount 실행
     // watch를 사용해 검색처리하기(client에서 필터링) 추가
-    let timeOut = null;
+    let getListTimeOut = null;
     watch(searchText,()=>{
-      clearTimeout(timeOut);//이전 interval 제거
-      timeOut = setTimeout(()=>{//검색 주기 지정
+      clearTimeout(getListTimeOut);//이전 interval 제거
+      getListTimeOut = setTimeout(()=>{//검색 주기 지정
         getTodos(1);
       },1000);
     });
     const searchTodo =()=>{//enterkey 연결
-      clearTimeout(timeOut);
+      clearTimeout(getListTimeOut);
       getTodos(1);
     }
 
@@ -186,8 +202,7 @@ export default {
         console.log(rs);
         alert(`데이터가 추가됨 \n id: ${rs.data.id}/ subject: ${rs.data.subject}`);
         //context.emit(데이터이름,데이터 obj)에서 전달받은 것
-        getTodos(1);
-      }).catch(err=>error.value=`Server error: 관리자에게 문의하세요 \n ${err}`);
+      }).catch(error=> triggerToast(`${error.name}: ${error.message} (code: ${error.code})`));
     }
     const toggleTodo=async (idx, checked)=>{
       error.value='';
@@ -198,10 +213,11 @@ export default {
         });
         console.log(result);
         alert(`${todoList.value[idx].id} 번 ${!checked?"-re-":"-완-"}`);
-      }catch (err){
-        error.value=`Server error: 관리자에게 문의하세요 \n ${err}`;
+      }catch (error){
+        triggerToast(`${error.name}: ${error.message} (code: ${error.code})`);
       }finally {
-        getTodos().catch(err=>error.value=`Server error: 관리자에게 문의하세요 \n ${err}`);
+        getTodos()
+            .catch(error=>triggerToast(`${error.name}: ${error.message} (code: ${error.code})`));
       }
     }
     const deleteTodo=(idx)=>{
@@ -212,8 +228,11 @@ export default {
             todoList.value.splice(idx,1);
             alert(`데이터가 삭제됨(${rs.status})`);
           })
-          .catch(err=>error.value=`Server error: 관리자에게 문의하세요 \n ${err}`);
+          .catch(error=>triggerToast(`${error.name}: ${error.message} (code: ${error.code})`));
     }
+    onBeforeUnmount(()=>{
+      clearTimeout(getListTimeOut);
+    })
     //export returns
     return {
       todo,
@@ -226,6 +245,11 @@ export default {
       error,
       totalPages,
       currentPage,
+      // toast
+      showToast,
+      toastMessage,
+      toastResStatus,
+
       getTodos,
       deleteTodo,
       toggleTodo,
