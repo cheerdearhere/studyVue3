@@ -1,7 +1,9 @@
 <!--  최상위 컴포넌트  -->
 <template>
   <Navbar/>
-  <router-view/>
+  <div class="container">
+    <router-view/>
+  </div>
 </template>
 
 <script>
