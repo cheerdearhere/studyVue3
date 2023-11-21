@@ -1,8 +1,11 @@
 <template>
   <div>
-    <h1>Todo List Page</h1>
+    <div class="d-flex justify-content-between mb-3">
+      <h1>Todo List Page</h1>
+      <button class="btn btn-outline-primary" @click.stop="goCreate">Create Todo</button>
+    </div>
+
     <div class="todoContainer container">
-      <h1>강의에 나온 todo list</h1>
       <input
           id="todo"
           class="form-control"
@@ -11,12 +14,7 @@
           v-model="searchText"
           @keyup.enter = "searchTodo"
       />
-      <!--  3. 태그입력  -->
       <div>
-        <!--  4. 전달 받기: context.emit  -->
-        <TodoSimpleForm
-            @add-todo="addTodoList"
-        />
         <div v-if="error" class="errorMsg">{{error}}</div>
         <div v-if="!todoList.length">
           작성된 내역이 없습니다.
@@ -72,7 +70,6 @@
 <script>
 /* 2. component 등록 */
 import TodoList from "@/components/TodoList.vue";
-import TodoSimpleForm from "@/components/TodoSimpleForm.vue";
 import ComputedCount from "@/components/ComputedCount.vue";
 import UseRef from "@/components/UseRef.vue";
 import {computed, onBeforeUnmount, reactive, ref, watch, watchEffect} from "vue";
@@ -80,16 +77,18 @@ import axios from "axios";
 import {host} from "@/router";
 import Toast from "@/components/Toast.vue";
 import {useToast} from "@/composables/toast";
+import {useRouter} from "vue-router";
 
 export default {
   components:{
     ComputedCount,
-    TodoSimpleForm,
     TodoList,
     UseRef,
     Toast,
   },
   setup(){
+    //router
+    const router = useRouter();
     // toast
     const {
       toastMessage,
@@ -220,6 +219,11 @@ export default {
           })
           .catch(error=>triggerToast(`${error.name}: ${error.message} (code: ${error.code})`));
     }
+    const goCreate = () =>{
+      router.push({
+        name:"TodoCreate"
+      });
+    }
     onBeforeUnmount(()=>{
       clearTimeout(getListTimeOut);
     })
@@ -247,6 +251,7 @@ export default {
       addTodoList,
       upTrue,
       downFalse,
+      goCreate,
     }
   }
 }
