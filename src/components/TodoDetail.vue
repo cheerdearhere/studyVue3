@@ -42,6 +42,11 @@
       </div>
     </form>
   </div>
+  <Toast
+    v-show="showToast"
+    :message="toastMessage"
+    :status="toastResStatus"
+  />
 </template>
 
 <script setup>
@@ -50,6 +55,7 @@ import axios from "axios";
 import {computed, ref} from "vue";
 import {host} from "@/router";
 import _ from "lodash";
+import Toast from "@/components/Toast.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -57,6 +63,10 @@ const router = useRouter();
 const todo = ref(null);
 const originTodo = ref(null);
 const loading = ref(true);//loading처리
+const showToast = ref(false);
+const toastMessage = ref("");
+const toastResStatus = ref(false);
+
 const id = route.params.id;
 const getTodo = async ()=>{
   const res = await axios.get(`${host}/${id}`);
@@ -92,12 +102,36 @@ const isTodoUpdated = computed(() =>{
   return check;
 });
 
+const resetToast = ()=>{
+  toastMessage.value="";
+  toastResStatus.value=false;
+}
+const triggerToast =(message,status)=>{
+  toastMessage.value=message;
+  toastResStatus.value=status;
+  showToast.value = true;
+  //5초뒤 리셋
+  setTimeout(()=>{
+    showToast.value = false;
+    resetToast();
+  },5000);
+}
 const onSave = async () =>{
   const updateData = todo.value;
-  const res = await axios.put(`${host}/${id}`,{ ...updateData });
-  if(res.status !== 200) throw new Error("server Error: failed save");
-  originTodo.value = {...res.data};
-  alert("success: update data");
+  try{
+    const res = await axios.put(`${host}/${id}`,{ ...updateData });
+    const {status, statusText} = res;
+    if(status !== 200) {//throw new Error("server Error: failed save");
+      triggerToast(`Error : ${statusText} (code: ${status})`,false);
+    }else{
+      triggerToast(`Success : Saved Todo`,true);
+      originTodo.value = {...res.data};
+    }
+  }
+  catch (error){
+    triggerToast(`${error.name}: ${error.message} (code: ${error.code})`);
+  }
+
 }
 // run
 getTodo();
