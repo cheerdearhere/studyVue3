@@ -36,7 +36,7 @@
       </div>
       <hr/>
       <div class="container">
-        <button type="submit" class="btn btn-outline-primary">Save</button>
+        <button type="submit" class="btn btn-outline-primary" :disabled="!isTodoUpdated">Save</button>
         <button type="button" class="btn btn-danger ml-2" @click.stop="goList">Cancel</button>
         <button type="button" class="btn btn-outline-dark ml-2" @click.stop="resetTodo">Reset</button>
       </div>
@@ -47,26 +47,27 @@
 <script setup>
 import {useRoute, useRouter} from "vue-router";
 import axios from "axios";
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import {host} from "@/router";
+import _ from "lodash";
 
 const route = useRoute();
 const router = useRouter();
 
 const todo = ref(null);
-let originTodo = {};
+const originTodo = ref(null);
 const loading = ref(true);//loading처리
 const id = route.params.id;
 const getTodo = async ()=>{
   const res = await axios.get(`${host}/${id}`);
   if(res.status !== 200) throw Error("Not found");
-  todo.value = res.data;
-  originTodo = {...res.data};
+  todo.value = {...res.data};
+  originTodo.value = {...res.data};
   loading.value = false; //완료 후 loading flag 처리
 }
 
 const resetTodo= ()=>{
-  todo.value = originTodo;
+  todo.value = {...originTodo.value};
 }
 
 const goList =()=>{
@@ -85,10 +86,17 @@ const toggleStatus = ()=>{
   todo.value.completed = !todo.value.completed;
 }
 
+const isTodoUpdated = computed(() =>{
+  const check= !_.isEqual(todo.value, originTodo.value);
+  console.log(check);
+  return check;
+});
+
 const onSave = async () =>{
   const updateData = todo.value;
   const res = await axios.put(`${host}/${id}`,{ ...updateData });
   if(res.status !== 200) throw new Error("server Error: failed save");
+  originTodo.value = {...res.data};
   alert("success: update data");
 }
 // run
