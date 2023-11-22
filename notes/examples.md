@@ -292,3 +292,43 @@ export const useToast= () =>{
   }
 </script>
 ```
+#### d. toast에 애니메이션 추가
+[document 보기](https://vuejs.org/guide/built-ins/transition.html)
+대상 컴포넌트를 <transition>으로 감싸고 name을지정
+```vue
+<transition name="infoSlide">
+  <Toast
+      v-show="showToast"
+      :message="toastMessage"
+      :status="toastResStatus"
+  />
+</transition>
+```
+스타일에서 다음 클래스로 값을 지정한다
+```asciidoc
+    .{name}-enter-active    : transition 시작할때 처리할 대상, 값 지정 
+    .{name}-leave-active    : transition 종료할때 처리할 대상, 값 지정 
+    .{name}-enter-from      : 표시할때 처음 상태
+    .{name}-leave-to        : 제거할때 끝 상태
+    .{name}-enter-to        : 표시할때 끝 상태  
+    .{name}-leave-from      : 제거할때 처음 상태
+```
+사용 예시
+```vue
+<style>
+  .infoSlide-enter-active,
+  .infoSlide-leave-active {
+    transition: all 0.3s ease;
+  }
+  .infoSlide-enter-from,
+  .infoSlide-leave-to {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  .infoSlide-enter-to,
+  .infoSlide-leave-from {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+</style>
+```
