@@ -5,13 +5,11 @@
       class="todoList card mt-2"
   >
     <div
-        class="card-body p-2 d-flex align-items-center"
+        class="card-body p-2 d-flex align-items-center box-pointer"
         @click="moveToPage(value.id)"
     >
-      <div class="form-check flex-grow-1">
-        &emsp;
+      <div class="flex-grow-1">
         <input
-          class="form-check-input"
           type="checkbox"
           :checked="value.completed"
           @change="toggleTodo(index, $event)"
@@ -20,21 +18,13 @@
         <!-- v-model="value.completed"
         : 단방향 전달인 props에서 양방향 처리인 v-model을 사용하는 것은 적절하지 않음
         -->        &emsp;
-        <label class="form-check-label">
-          <!--      css 바인딩 : object -->
-          <h5
-              class="todoLabel"
-              :style="value.completed ? todoStyle:{}"
-          >
-            <!--      css 바인딩 : class 사용
-            <h5
-                class="todoLabel"
-                :class="{completedTodo: value.completed }"
-            >
-            -->
+        <span
+            class="todoLabel"
+            :class="{todo:value.completed}"
+            :style="value.completed ? todoStyle:{}"
+        >
             {{value.id}}. {{value.subject}}
-          </h5>
-        </label>
+        </span>
       </div>
       <div>
         <button
@@ -108,6 +98,8 @@
     }
   }
 </script>
-<style>
-
+<style scoped>
+.box-pointer{
+  cursor: pointer;
+}
 </style>
