@@ -332,3 +332,201 @@ export const useToast= () =>{
   }
 </style>
 ```
+### 4. modal 만들기
+가능하면 모달창은 최상위에서 공통 컴포넌트로 처리하는 것이 좋음
+
+모달창 형식은 [bootstrap](https://getbootstrap.com/docs/4.0/components/modal/)에서 가져옴
+```html
+<!--
+원레는 JQuery로 사용. 이를 막기위해 새 class사용
+div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+-->
+<div class="modal-wrapper">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+```
+#### a. 모달 위치 조정하기
+style scoped로 선언해서 처리
+```vue
+<style scoped>
+  .modal-wrapper{
+    z-index: 2000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #00000088;
+  }
+</style>
+```
+#### b. modal component를 관리할 flag ref
+```vue
+<template>
+  <Modal
+      v-if="modalFlag"
+  />
+</template>
+<script>
+import {ref} from 'vue';
+export default {
+    setup(){
+        const modalFlag = ref(false);
+        
+        return {
+            modalFlag,
+        }
+    }
+}
+</script>
+```
+#### c. 열기/닫기 버튼 연결
+모달 컴포넌트
+```vue
+<template>
+  <div class="modal-footer">
+    <button
+        type="button"
+        class="btn btn-secondary"
+        @click="closeModal"
+    >
+      Close
+    </button>
+  </div>
+</template>
+<script>
+  export default {
+    emits:{
+      modalFlag:{
+        type: Boolean,
+        default: false,
+      }
+    },
+    setup(props,context){
+      const {emit} = context;
+      const closeModal = ()=>{
+        emit('closeModal');
+      }
+      return{
+        closeModal,
+      }
+    }
+  }
+</script>
+```
+대상 위치 eventListener 차리
+
+```vue
+<template>
+  <Modal
+      v-if="modalFlag"
+      @closeModal="closeModal"
+      @deleteTodo="deleteTodo"
+  />
+</template>
+<script>
+  import Modal from "./Modal.vue";
+
+  export default {
+    components:{
+     Modal,   
+    },
+    setup() {
+      const modalFlag = ref(false);
+      const deleteTodoId = ref(null);
+      const openModal = (id) => {
+        deleteTodoId.value = id;
+        modalFlag.value = true;
+      }
+      const closeModal = () => {
+        deleteTodoId.value = null;
+        modalFlag.value = false;
+      }
+      // 기능구현
+      const deleteTodo = () => {
+        emit('delete-todo', deleteTodoId.value);
+        closeModal();
+      }
+      return {
+        modalFlag,
+        openModal,
+        closeModal,
+        deleteTodo,
+      }
+    }
+  }
+</script>
+```
+#### d. modal 적용
+```vue
+<template>
+  <div class="modal-wrapper">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <button type="button" class="close" @click="closeModal">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this todo?
+        </div>
+        <div class="modal-footer">
+          <button
+              type="button"
+              class="btn btn-secondary"
+              @click="closeModal"
+          >
+            Close
+          </button>
+          <button type="button" class="btn btn-danger" @click="onDelete">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  props:{
+
+  },
+  emits:{
+    modalFlag:{
+      type: Boolean,
+      default: false,
+    }
+  },
+  setup(props,context){
+    const {emit} = context;
+    const closeModal = ()=>{
+      emit('closeModal');
+    }
+    const onDelete = ()=>{
+      emit('deleteTodo');
+    }
+    return{
+      closeModal,
+      onDelete,
+    }
+  }
+}
+</script>
+```
