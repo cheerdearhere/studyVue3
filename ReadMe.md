@@ -142,6 +142,9 @@ vue.js 2.0에서는 [options API](https://ko.vuejs.org/guide/introduction.html#s
 [문서로 이동](notes/router.md)
 ## F. Component Lifecycle Hooks
 [문서로 이동](notes/compnentLifecycleHooks.md)
+## G. Teleport, slot 
+[문서로 이동](notes/teleportAndSlot.md)
+
 
 # III. 기타 기능
 [문서로 이동](notes/examples.md)
