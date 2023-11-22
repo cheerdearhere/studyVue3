@@ -48,13 +48,23 @@
       <button type="button" class="btn btn-outline-dark ml-2" @click.stop="resetTodo">Reset</button>
     </div>
   </form>
-  <transition name="infoSlide">
-    <Toast
-        v-show="showToast"
-        :message="toastMessage"
-        :status="toastResStatus"
+  <teleport to="#confirmModal">
+    <SaveModal
+        v-if="modalFlag"
+        :isEdit="isEdit"
+        @closeModal="closeModal"
+        @onSave="onSave"
     />
-  </transition>
+  </teleport>
+  <teleport to="#resultAlert">
+    <transition name="infoSlide">
+      <Toast
+          v-show="showToast"
+          :message="toastMessage"
+          :status="toastResStatus"
+      />
+    </transition>
+  </teleport>
 </template>
 
 <script>
@@ -66,8 +76,12 @@ import {host} from "@/router";
 import _ from "lodash";
 import {useToast} from "@/composables/toast";
 import {useRoute, useRouter} from "vue-router";
+import SaveModal from "@/components/SaveModal.vue";
+import DeleteModal from "@/components/DeleteModal.vue";
 export default {
   components: {
+    DeleteModal,
+    SaveModal,
     Toast,
     TodoSimpleForm,
   },

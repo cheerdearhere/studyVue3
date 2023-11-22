@@ -3,13 +3,15 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <h5 class="modal-title" id="exampleModalLabel">
+            <slot name="modalTitle"></slot>
+          </h5>
           <button type="button" class="close" @click="closeModal">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          Are you sure you want to delete this todo?
+          <slot name="modalBody"></slot>
         </div>
         <div class="modal-footer">
           <button
@@ -19,7 +21,7 @@
           >
             Close
           </button>
-          <button type="button" class="btn btn-danger" @click="onDelete">Delete</button>
+          <slot name="modalExecuteBtn"></slot>
         </div>
       </div>
     </div>
@@ -42,12 +44,8 @@ export default {
     const closeModal = ()=>{
       emit('closeModal');
     }
-    const onDelete = ()=>{
-      emit('deleteTodo');
-    }
     return{
       closeModal,
-      onDelete,
     }
   }
 }

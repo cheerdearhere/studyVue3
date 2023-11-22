@@ -42,11 +42,15 @@
       </div>
     </form>
   </div>
-  <Toast
-    v-show="showToast"
-    :message="toastMessage"
-    :status="toastResStatus"
-  />
+  <teleport to="#resultAlert">
+    <transition name="infoSlide">
+      <Toast
+          v-show="showToast"
+          :message="toastMessage"
+          :status="toastResStatus"
+      />
+    </transition>
+  </teleport>
 </template>
 
 <script setup>

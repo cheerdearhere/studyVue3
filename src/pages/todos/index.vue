@@ -60,11 +60,15 @@
     </div>
     <div class="footer"></div>
   </div>
-  <Toast
-      v-show="showToast"
-      :message="toastMessage"
-      :status="toastResStatus"
-  />
+  <teleport to="#resultAlert">
+    <transition name="infoSlide">
+      <Toast
+          v-show="showToast"
+          :message="toastMessage"
+          :status="toastResStatus"
+      />
+    </transition>
+  </teleport>
 </template>
 
 <script>
@@ -258,27 +262,4 @@ export default {
 }
 </script>
 <style scoped>
-body{
-  width: 100%;
-  height: 100%;
-  margin: 5%;
-}
-div{
-  background: #fff;
-  color:#000;
-}
-.todoContainer{
-  margin-top: 2%;
-  margin-bottom: 5%;
-}
-.errorMsg{
-  font-size: smaller;
-  font-weight: bolder;
-  color:red;
-  background: #000;
-}
-.footer{
-  height:20px;
-  width:100vw;
-}
 </style>

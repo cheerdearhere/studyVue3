@@ -36,16 +36,19 @@
       </div>
     </div>
   </div>
-  <Modal
-    v-if="modalFlag"
-    @closeModal="closeModal"
-    @deleteTodo="deleteTodo"
-  />
+
+  <teleport to="#confirmModal">
+    <DeleteModal
+      v-if="modalFlag"
+      @closeModal="closeModal"
+      @deleteTodo="deleteTodo"
+    />
+  </teleport>
 </template>
 <script>
   import {watchEffect, ref} from "vue";
   import {useRouter} from "vue-router";
-  import Modal from '@/components/Modal.vue'
+  import DeleteModal from '@/components/DeleteModal.vue';
 
   export default{
     /* array로 받을 수 있음 */
@@ -70,7 +73,7 @@
       'delete-todo',
     ],
     components:{
-      Modal
+      DeleteModal
     },
     setup(props, {emit}){
       // watchEffect 영ㄴ습

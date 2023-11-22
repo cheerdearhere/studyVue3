@@ -1,12 +1,11 @@
 <template>
-  <div
-      class="alert toast-box"
-      :class="status ? 'alert-success' : 'alert-danger'"
-      role="alert"
-  >
-    {{ message }}
-  </div>
-
+    <div
+        class="alert toast-box"
+        :class="status ? 'alert-success' : 'alert-danger'"
+        role="alert"
+    >
+      {{ message }}
+    </div>
 </template>
 <script>
 
