@@ -95,7 +95,15 @@ stylesheet 직접 작성
   //stylesheet
 </style>
 ```
-bootstrap을 사용하는 경우
+style tag에 scope를 적으면 해당 컴포넌트에서만 작동
+```vue
+<style scoped>
+// scope:  only this component
+</style>
+```
+global과 local을 한 컴포넌트에서 병행할 수 있다. 
+
+bootstrap을 사용하는 경우:
 
 [Bootstrap CDN](https://www.bootstrapcdn.com/)을 public폴더의 [index.html](./public/index.html)에 연결
 ```html
