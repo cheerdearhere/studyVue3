@@ -105,6 +105,12 @@ export default {
 }
 </script>
 ```
+링크로 바로 연결할 경우 동적처리하는 방법
+```vue
+<router-link :to="{path: pageURL.freeBoard.detail + item.num }">
+  {{item.title}}
+</router-link>
+```
 router에 등록한 name으로도 이동가능
 ```vue
     <router-link class="navbar-brand" :to="{name: 'Home'}">Vue 3.0</router-link>
