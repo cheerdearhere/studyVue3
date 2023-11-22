@@ -29,17 +29,23 @@
       <div>
         <button
             class="btn btn-outline-danger btn-sm"
-            @click.stop="deleteTodo(index)"
+            @click.stop="openModal(value.id)"
         >
           Delete
         </button>
       </div>
     </div>
   </div>
+  <Modal
+    v-if="modalFlag"
+    @closeModal="closeModal"
+    @deleteTodo="deleteTodo"
+  />
 </template>
 <script>
-  import {watchEffect} from "vue";
+  import {watchEffect, ref} from "vue";
   import {useRouter} from "vue-router";
+  import Modal from '@/components/Modal.vue'
 
   export default{
     /* array로 받을 수 있음 */
@@ -63,7 +69,11 @@
       'toggle-todo',
       'delete-todo',
     ],
+    components:{
+      Modal
+    },
     setup(props, {emit}){
+      // watchEffect 영ㄴ습
       let val  = 2;
       watchEffect(()=>{
         console.log("list length",props.todoList.length);
@@ -72,13 +82,23 @@
       val++;
       val++;
 
-
+      const modalFlag = ref(false);
+      const deleteTodoId = ref(null);
+      const openModal = (id)=>{
+        deleteTodoId.value = id;
+        modalFlag.value = true;
+      }
+      const closeModal = ()=>{
+        deleteTodoId.value=null;
+        modalFlag.value= false;
+      }
+      const deleteTodo = ()=>{
+        emit('delete-todo',deleteTodoId.value);
+        closeModal();
+      }
       // context.emit을 구조분해할당을 쓰면 더 간결
       const toggleTodo = (index, event)=>{
         emit('toggle-todo',index, event.target.checked);
-      }
-      const deleteTodo = (index)=>{
-        emit('delete-todo',index)
       }
       const router = useRouter();
       const moveToPage = (id)=>{
@@ -91,9 +111,12 @@
         })
       }
       return{
+        modalFlag,
         toggleTodo,
         deleteTodo,
         moveToPage,
+        openModal,
+        closeModal,
       }
     }
   }

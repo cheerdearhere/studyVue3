@@ -73,7 +73,7 @@ import TodoList from "@/components/TodoList.vue";
 import ComputedCount from "@/components/ComputedCount.vue";
 import UseRef from "@/components/UseRef.vue";
 import {computed, onBeforeUnmount, reactive, ref, watch, watchEffect} from "vue";
-import axios from "axios";
+import axios, {HttpStatusCode} from "axios";
 import {host} from "@/router";
 import Toast from "@/components/Toast.vue";
 import {useToast} from "@/composables/toast";
@@ -162,7 +162,7 @@ export default {
         todoList.value = rs.data;
         totalCnt.value = rs.headers['x-total-count'];
       }catch (error){
-        triggerToast(`${error.name}: ${error.message} (code: ${error.code})`);
+        triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,false);
       }
     }
     getTodos(1);//mount 실행
@@ -191,7 +191,7 @@ export default {
         console.log(rs);
         alert(`데이터가 추가됨 \n id: ${rs.data.id}/ subject: ${rs.data.subject}`);
         //context.emit(데이터이름,데이터 obj)에서 전달받은 것
-      }).catch(error=> triggerToast(`${error.name}: ${error.message} (code: ${error.code})`));
+      }).catch(error=> triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,false));
     }
     const toggleTodo=async (idx, checked)=>{
       error.value='';
@@ -200,24 +200,25 @@ export default {
         const result = await axios.patch(`${host}/${id}`,{
           completed: checked,//!todoList.value[idx].completed
         });
-        console.log(result);
-        alert(`${todoList.value[idx].id} 번 ${!checked?"-re-":"-완-"}`);
+        triggerToast(`${todoList.value[idx].id} 번 ${!checked?"-re-":"-완-"}`,true);
       }catch (error){
-        triggerToast(`${error.name}: ${error.message} (code: ${error.code})`);
+        triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,false);
       }finally {
         getTodos()
-            .catch(error=>triggerToast(`${error.name}: ${error.message} (code: ${error.code})`));
+            .catch(error=>triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,false));
       }
     }
-    const deleteTodo=(idx)=>{
+    const deleteTodo= async (todoId)=>{
       error.value='';
-      const id = todoList.value[idx].id;
-      axios.delete(`${host}/${id}`)
+      await axios.delete(`${host}/${todoId}`)
           .then(rs=>{
-            todoList.value.splice(idx,1);
-            alert(`데이터가 삭제됨(${rs.status})`);
+            if(rs.status !== HttpStatusCode.Ok){
+              triggerToast(`${rs.statusText}: ${rs.status}`,false)
+            }
+            getTodos(1);
+            triggerToast(`데이터가 삭제됨(${rs.status})`,true);
           })
-          .catch(error=>triggerToast(`${error.name}: ${error.message} (code: ${error.code})`));
+          .catch(error=>triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,false));
     }
     const goCreate = () =>{
       router.push({
@@ -265,6 +266,10 @@ body{
 div{
   background: #fff;
   color:#000;
+}
+.todoContainer{
+  margin-top: 2%;
+  margin-bottom: 5%;
 }
 .errorMsg{
   font-size: smaller;
