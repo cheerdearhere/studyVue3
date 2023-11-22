@@ -48,11 +48,13 @@
       <button type="button" class="btn btn-outline-dark ml-2" @click.stop="resetTodo">Reset</button>
     </div>
   </form>
-  <Toast
-      v-show="showToast"
-      :message="toastMessage"
-      :status="toastResStatus"
-  />
+  <transition name="infoSlide">
+    <Toast
+        v-show="showToast"
+        :message="toastMessage"
+        :status="toastResStatus"
+    />
+  </transition>
 </template>
 
 <script>
@@ -204,5 +206,20 @@ export default {
 .errorMessage{
   font-size: small;
   color: red;
+}
+
+.infoSlide-enter-active,
+.infoSlide-leave-active {
+  transition: all 0.3s ease;
+}
+.infoSlide-enter-from,
+.infoSlide-leave-to {
+  opacity: 0;
+  transform: translateY(-30px);
+}
+.infoSlide-enter-to,
+.infoSlide-leave-from {
+  opacity: 1;
+  transform: translateY(0px);
 }
 </style>
