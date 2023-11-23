@@ -18,14 +18,14 @@ const router = createRouter({
             component   : Home,//해당 컴포넌트
         },
         {
-            path        : '/todos',
-            name        : 'TodoList',
-            component   : Todos,
-        },
-        {
             path        : '/count',
             name        : 'computedCount',
             component   : ComputedCount,
+        },
+        {
+            path        : '/todos',
+            name        : 'TodoList',
+            component   : Todos,
         },
         {
             path        : '/todos/create',

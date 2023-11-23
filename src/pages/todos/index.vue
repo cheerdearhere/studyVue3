@@ -91,7 +91,7 @@ export default {
     Toast,
   },
   setup(){
-    //router
+    // router
     const router = useRouter();
     // toast
     const {
@@ -193,7 +193,7 @@ export default {
         completed: todo.completed,
       }).then(rs=>{
         console.log(rs);
-        alert(`데이터가 추가됨 \n id: ${rs.data.id}/ subject: ${rs.data.subject}`);
+        triggerToast(`데이터가 추가됨 \n id: ${rs.data.id}/ subject: ${rs.data.subject}`,true);
         //context.emit(데이터이름,데이터 obj)에서 전달받은 것
       }).catch(error=> triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,false));
     }

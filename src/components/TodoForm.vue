@@ -48,14 +48,14 @@
       <button type="button" class="btn btn-outline-dark ml-2" @click.stop="resetTodo">Reset</button>
     </div>
   </form>
-  <teleport to="#confirmModal">
-    <SaveModal
-        v-if="modalFlag"
-        :isEdit="isEdit"
-        @closeModal="closeModal"
-        @onSave="onSave"
-    />
-  </teleport>
+<!--  <teleport to="#confirmModal">-->
+<!--    <SaveModal-->
+<!--        v-if="modalFlag"-->
+<!--        :isEdit="isEdit"-->
+<!--        @closeModal="closeModal"-->
+<!--        @onSave="onSave"-->
+<!--    />-->
+<!--  </teleport>-->
   <teleport to="#resultAlert">
     <transition name="infoSlide">
       <Toast

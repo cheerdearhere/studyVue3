@@ -144,3 +144,6 @@ export default {
 
 </style>
 ```
+
+### 3. 주의
+#### a. teleport로 외부로 빼낸 컴포넌트에서 에러가 발생하면 runtime 에러를 발생 시키므로 이에 주의한다. 
