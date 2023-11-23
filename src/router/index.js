@@ -7,7 +7,7 @@ import ComputedCount from "@/pages/count/index.vue";
 
 const domain = "http://localhost";
 const port =  9000;
-const host = `${domain}:${port}/todos`;
+const todoHost = `${domain}:${port}/todos`;
 
 const router = createRouter({
     history:createWebHistory(),//manage web history
@@ -42,5 +42,5 @@ const router = createRouter({
 });
 export default router;
 export {
-    host,
+    todoHost,
 }

@@ -57,7 +57,7 @@
 import {useRoute, useRouter} from "vue-router";
 import axios from "axios";
 import {computed, onBeforeMount, ref} from "vue";
-import {host} from "@/router";
+import {todoHost} from "@/router";
 import _ from "lodash";
 import Toast from "@/components/Toast.vue";
 import {useToast} from "@/composables/toast";
@@ -78,7 +78,7 @@ const {
 
 const id = route.params.id;
 const getTodo = async ()=>{
-  const res = await axios.get(`${host}/${id}`);
+  const res = await axios.get(`${todoHost}/${id}`);
   if(res.status !== 200) throw Error("Not found");
   todo.value = {...res.data};
   originTodo.value = {...res.data};
@@ -114,7 +114,7 @@ const isTodoUpdated = computed(() =>{
 const onSave = async () =>{
   const updateData = todo.value;
   try{
-    const res = await axios.put(`${host}/${id}`,{ ...updateData });
+    const res = await axios.put(`${todoHost}/${id}`,{ ...updateData });
     const {status, statusText} = res;
     if(status !== 200) {//throw new Error("server Error: failed save");
       triggerToast(`Error : ${statusText} (code: ${status})`,false);

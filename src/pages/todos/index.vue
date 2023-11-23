@@ -78,7 +78,7 @@ import ComputedCount from "@/components/ComputedCount.vue";
 import UseRef from "@/components/UseRef.vue";
 import {computed, onBeforeUnmount, reactive, ref, watch, watchEffect} from "vue";
 import axios, {HttpStatusCode} from "axios";
-import {host} from "@/router";
+import {todoHost} from "@/router";
 import Toast from "@/components/Toast.vue";
 import {useToast} from "@/composables/toast";
 import {useRouter} from "vue-router";
@@ -162,7 +162,7 @@ export default {
       currentPage.value = page;
       error.value='';
       try{
-        const rs = await axios.get(`${host}?_sort=id&_order=desc&subject_like=${searchText.value}&_page=${currentPage.value}&_limit=${cnt}`);//json-server에서 사용하는 페이지네이션
+        const rs = await axios.get(`${todoHost}?_sort=id&_order=desc&subject_like=${searchText.value}&_page=${currentPage.value}&_limit=${cnt}`);//json-server에서 사용하는 페이지네이션
         todoList.value = rs.data;
         totalCnt.value = rs.headers['x-total-count'];
       }catch (error){
@@ -188,7 +188,7 @@ export default {
       //axios를 사용해 서버로 전송 > db.json에 저장
       error.value= '';
       //서버(지금은 임시)로 전달
-      axios.post(host,{
+      axios.post(todoHost,{
         subject: todo.subject,
         completed: todo.completed,
       }).then(rs=>{
@@ -201,7 +201,7 @@ export default {
       error.value='';
       const id = todoList.value[idx].id;
       try{
-        const result = await axios.patch(`${host}/${id}`,{
+        const result = await axios.patch(`${todoHost}/${id}`,{
           completed: checked,//!todoList.value[idx].completed
         });
         triggerToast(`${todoList.value[idx].id} 번 ${!checked?"-re-":"-완-"}`,true);
@@ -214,7 +214,7 @@ export default {
     }
     const deleteTodo= async (todoId)=>{
       error.value='';
-      await axios.delete(`${host}/${todoId}`)
+      await axios.delete(`${todoHost}/${todoId}`)
           .then(rs=>{
             if(rs.status !== HttpStatusCode.Ok){
               triggerToast(`${rs.statusText}: ${rs.status}`,false)
