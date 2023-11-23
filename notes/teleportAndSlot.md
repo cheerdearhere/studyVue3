@@ -144,6 +144,37 @@ export default {
 
 </style>
 ```
-
+#### d. [Scoped Slot](https://vuejs.org/guide/components/slots.html#scoped-slots)
+child에서도 slot으로 값을 올려보낼 수 있음
+```vue
+<!-- 하위 component에서 bind -->
+<template>
+  <div
+      v-for="(item,index) in items"
+      :key="item.id"
+      class="card mt-2"
+  >
+    <slot
+        :item="item"
+        :index="index"
+    />
+  </div>
+</template>
+```
+상위 컴포넌트에서 받을때 template에서 props obj 사용
+```vue
+    <template #default="slotProps">
+      <div
+          class="card-body p-2 d-flex align-items-center box-pointer"
+          @click="moveToPage(slotProps.item.id)"
+      >
+        <div class="flex-grow-1">
+          <input
+              type="checkbox"
+              :checked="slotProps.item.completed"
+              @change="toggleTodo(slotProps.index, $event)"
+              @click.stop
+          />
+```
 ### 3. 주의
 #### a. teleport로 외부로 빼낸 컴포넌트에서 에러가 발생하면 runtime 에러를 발생 시키므로 이에 주의한다. 
