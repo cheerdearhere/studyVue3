@@ -72,7 +72,7 @@ import TodoSimpleForm from "@/components/TodoSimpleForm.vue";
 import Toast from "@/components/Toast.vue";
 import {computed, ref} from "vue";
 import axios, {HttpStatusCode} from "axios";
-import {host} from "@/router";
+import {todoHost} from "@/router";
 import _ from "lodash";
 import {useToast} from "@/composables/toast";
 import {useRoute, useRouter} from "vue-router";
@@ -115,7 +115,7 @@ export default {
 
     const getTodo = async ()=>{
       loading.value=true;
-      const res = await axios.get(`${host}/${id}`);
+      const res = await axios.get(`${todoHost}/${id}`);
       if(res.status !== 200) {
         triggerToast("Not found", false);
         throw new Error("check the todo's id");
@@ -167,10 +167,10 @@ export default {
       try{
         let res;
         if(props.editing){
-          res = await axios.put(`${host}/${id}`,{ ...updateData });
+          res = await axios.put(`${todoHost}/${id}`,{ ...updateData });
         }
         else{
-          res = await axios.post(`${host}`,{ ...updateData });
+          res = await axios.post(`${todoHost}`,{ ...updateData });
         }
 
         const {status, statusText} = res;
@@ -178,7 +178,14 @@ export default {
           triggerToast(`Error : ${statusText} (code: ${status})`,false);
         }else{
           triggerToast(`Success : ${props.editing ? "Updated" : "Created"}`,true);
-          originTodo.value = {...res.data};
+          if(props.editing){
+            originTodo.value = {...res.data};
+          }
+          else{
+            resetTodo();
+            await router.push("/todos");
+          }
+
         }
       }
       catch (error){
