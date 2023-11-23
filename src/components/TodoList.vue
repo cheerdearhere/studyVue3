@@ -1,18 +1,22 @@
 <template>
-  <div
-      v-for="(value,index) in todoList"
-      :key="value.id"
-      class="todoList card mt-2"
+<!--  <div-->
+<!--      v-for="(value,index) in todoList"-->
+<!--      :key="value.id"-->
+<!--      class="todoList card mt-2"-->
+<!--  >-->
+  <List
+    :items="todoList"
   >
+    <template #default="slotProps">
     <div
         class="card-body p-2 d-flex align-items-center box-pointer"
-        @click="moveToPage(value.id)"
+        @click="moveToPage(slotProps.item.id)"
     >
       <div class="flex-grow-1">
         <input
           type="checkbox"
-          :checked="value.completed"
-          @change="toggleTodo(index, $event)"
+          :checked="slotProps.item.completed"
+          @change="toggleTodo(slotProps.index, $event)"
           @click.stop
         />
         <!-- v-model="value.completed"
@@ -20,22 +24,24 @@
         -->        &emsp;
         <span
             class="todoLabel"
-            :class="{todo:value.completed}"
-            :style="value.completed ? todoStyle:{}"
+            :class="{todo:slotProps.item.completed}"
+            :style="slotProps.item.completed ? todoStyle:{}"
         >
-            {{value.id}}. {{value.subject}}
+            {{slotProps.item.id}}. {{slotProps.item.subject}}
         </span>
       </div>
       <div>
         <button
             class="btn btn-outline-danger btn-sm"
-            @click.stop="openModal(value.id)"
+            @click.stop="openModal(slotProps.item.id)"
         >
           Delete
         </button>
       </div>
     </div>
-  </div>
+    </template>
+  </List>
+<!--  </div>-->
 
   <teleport to="#confirmModal">
     <DeleteModal
@@ -49,6 +55,7 @@
   import {watchEffect, ref} from "vue";
   import {useRouter} from "vue-router";
   import DeleteModal from '@/components/DeleteModal.vue';
+  import List from '@/components/List.vue';
 
   export default{
     /* array로 받을 수 있음 */
@@ -73,7 +80,8 @@
       'delete-todo',
     ],
     components:{
-      DeleteModal
+      DeleteModal,
+      List
     },
     setup(props, {emit}){
       // watchEffect 영ㄴ습
