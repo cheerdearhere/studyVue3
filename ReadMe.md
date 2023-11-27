@@ -146,7 +146,7 @@ vue.js 2.0에서는 [options API](https://ko.vuejs.org/guide/introduction.html#s
 [문서로 이동](notes/teleportAndSlot.md)
 
 
-# III. 기타 기능
+# III. 기타 기능 
 [문서로 이동](notes/examples.md)
 
 # IV. 유용한 Library
@@ -204,3 +204,5 @@ vue.js 2.0에서는 [options API](https://ko.vuejs.org/guide/introduction.html#s
 
 </script>
 ```
+### B. chrome 확장프로그램: vue devtools
+[vue devtools 설치하기](https://chromewebstore.google.com/detail/nhdogjmejiglipccpnnnanhbledajbpd?hl=ko)
