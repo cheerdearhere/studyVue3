@@ -127,6 +127,8 @@ json-server.json(설정 파일)
 [youTube : dreamCoding 강의](https://www.youtube.com/watch?v=JB_yU6Oe2eE)
 
 [정리한 문서 이동](notes/Synchronous_Asynchronous.md)
+## C. 기본 연결
+[문서로 이동](notes/AxiosConfig.md)
 
 # II. Vue 3.0: [composition API](https://ko.vuejs.org/guide/introduction.html#single-file-components)
 vue.js 2.0에서는 [options API](https://ko.vuejs.org/guide/introduction.html#single-file-components)가 사용됨
@@ -204,5 +206,9 @@ vue.js 2.0에서는 [options API](https://ko.vuejs.org/guide/introduction.html#s
 
 </script>
 ```
-### B. chrome 확장프로그램: vue devtools
+## B. chrome 확장프로그램: vue devtools
 [vue devtools 설치하기](https://chromewebstore.google.com/detail/nhdogjmejiglipccpnnnanhbledajbpd?hl=ko)
+
+## C. [vuex](https://v3.vuex.vuejs.org/kr/)
+전역변수 관리
+[이동](notes/Vuex.md)

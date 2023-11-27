@@ -316,7 +316,7 @@ export const useToast= () =>{
 사용 예시
 ```vue
 <style>
-  .infoSlide-enter-active,
+  .,
   .infoSlide-leave-active {
     transition: all 0.3s ease;
   }
@@ -529,4 +529,264 @@ export default {
   }
 }
 </script>
+```
+### 5. transition group(여러 알림창 누적해서 띄우기)
+#### a. toast에서 v-if 제거, toast-box 묶기
+```vue
+<template>
+  <div class="toast-box">
+    <div
+        class="alert"
+        :class="`alert-${status}`"
+        role="alert"
+    >
+      {{ message }}
+    </div>
+  </div>
+</template>
+```
+#### b. .toast-box 내부에 새 메세지 추가되도록 처리
+vuex store에서 list관리
+```javascript
+export default {
+    namespaced:true,//사용여부
+    state:{
+        //전역에서 관리할 데이터
+        toasts: [],
+        // showToast         : false,
+        // toastMessage      : "",
+        // toastResStatus    : "",
+    },
+    mutations: {
+        // UPDATE_TOAST_MESSAGE(state, payload){
+        //     state.toastMessage = payload;
+        // },
+        // UPDATE_TOAST_STATUS(state, payload){
+        //     state.toastResStatus = payload;
+        // },
+        // UPDATE_SHOW_TOAST_FLAG(state, payload){
+        //     state.showToast = payload;
+        // },
+        ADD_TOAST(state, payload){
+            state.toasts.push(payload);
+        },
+        REMOVE_TOAST(state, payload){
+            state.toasts.shift();//처음 들어온 아이템 제거
+        }
+    },
+    actions: {
+        triggerToast (context, payload){
+            const {commit} = context;
+            const {message, toastResStatus} = payload;
+            // commit('UPDATE_TOAST_MESSAGE',message);
+            // commit('UPDATE_TOAST_STATUS',toastResStatus);
+            // commit('UPDATE_SHOW_TOAST_FLAG',true);
+            commit('ADD_TOAST',{
+                id: Date.now(),
+                message,
+                status: toastResStatus
+            });
+            //5초뒤 리셋
+            setTimeout(()=>{
+                // commit('UPDATE_TOAST_MESSAGE','');
+                // commit('UPDATE_TOAST_STATUS','');
+                // commit('UPDATE_SHOW_TOAST_FLAG',false);
+                commit('REMOVE_TOAST');
+            },3000);
+        },
+        // resetTimeOut({commit}){
+        //     commit('UPDATE_TOAST_TIMEOUT',null);
+        // }
+    },
+    getters:{//state를 밖으로 보낼때 별도의 getter를 지정할 수 있다.
+        // toastMessageWithSmile(state){
+        //     return state.toasts+' :)';
+        // }
+    },
+}
+```
+변경된 부분 적용
+```javascript
+import {computed} from "vue";
+import {useStore} from "vuex";
+
+export const useToast= () =>{
+// Toast > mutations, store
+    // const showToast = ref(false);
+    // const toastMessage = ref("");
+    // const toastResStatus = ref(false);
+    // const timeOut = ref(null);
+    //vuex store
+    const store = useStore();
+    // const toastMessage = computed(()=>store.getters['toast/toastMessageWithSmile']);
+    // const toastResStatus = computed(()=>store.state.toast.toastResStatus);
+    // const showToast = computed(()=>store.state.toast.showToast);
+    const toasts = computed(()=>store.state.toast.toasts);
+//  action으로 이동, store.dispatch로 실행
+//     const resetToast = ()=>{
+//         toastMessage.value="";
+//         toastResStatus.value=false;
+//     }
+//     const triggerToast =(message,status)=>{
+//         toastMessage.value=message;
+//         toastResStatus.value=status;
+//         showToast.value = true;
+//         //5초뒤 리셋
+//         timeOut.value = setTimeout(()=>{
+//             showToast.value = false;
+//             resetToast();
+//         },3000);
+//     }
+    const triggerToast = (message,toastResStatus)=>{
+        console.log("toastJS",{message,toastResStatus})
+        store.dispatch('toast/triggerToast', {message, toastResStatus});
+    }
+
+    return {
+        toasts,
+        triggerToast,
+    }
+}
+```
+해당 컴포넌트로 이동해 array 기준 적용
+
+App.vue에 있던 transition을 가져옴.
+
+transition이 여럿인 경우 transition-group 사용
+```vue
+<template>
+  <div class="toast-box">
+    <transition-group name="infoSlide">
+      <div
+          v-for="toast in toasts"
+          :key="toast.id"
+          class="alert"
+          :class="`alert-${toast.status}`"
+          role="alert"
+      >
+        {{ toast.message }}
+      </div>
+    </transition-group>
+  </div>
+</template>
+<script>
+import {useToast} from "@/composables/toast";
+
+export default {
+  // props:{
+  //   message: {
+  //     type: String,
+  //     required: true,
+  //   },
+  //   status: {
+  //     type: String,
+  //     default: "danger",
+  //   },
+  // },
+  setup(){
+    const {toasts} = useToast();
+    return {
+      toasts,
+    }
+  }
+}
+</script>
+
+<style scoped>
+  .toast-box{
+    position: fixed;
+    z-index: 1000;
+    top: 10px;
+    right: 10px;
+  }
+
+  .infoSlide-enter-active,
+  .infoSlide-leave-active {
+    transition: all 0.3s ease;
+  }
+  .infoSlide-enter-from,
+  .infoSlide-leave-to {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  .infoSlide-enter-to,
+  .infoSlide-leave-from {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+</style>
+```
+### 6. pagination 꺼내오기
+```vue
+<template>
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      <li v-if="currentPage !== 1" class="page-item" >
+        <a class="page-link" href="#" @click.prevent="onClick(1)">First</a>
+      </li>
+      <li class="page-item" :class="currentPage === 1?'disabled':''">
+        <a class="page-link" href="#" disabled="{{currentPage !== 1}}" @click.prevent="onClick(currentPage-1)">prev</a>
+      </li>
+      <li
+          v-for="page in totalPages"
+          :key ="page"
+          class="page-item"
+          :class="currentPage===page?'active':''"
+      >
+        <a class="page-link" href="" @click.prevent="onClick(page)" >
+          {{page}}
+        </a>
+      </li>
+      <li class="page-item" :class="currentPage === totalPages?'disabled':''">
+        <a class="page-link" href="#" disabled="{{currentPage !== totalPages}}" @click.prevent="onClick(currentPage+1)">Next</a>
+      </li>
+      <li class="page-item" :class="currentPage === totalPages?'disabled':''">
+        <a class="page-link" href="#" disabled="{{currentPage !== totalPages}}" @click.prevent="onClick(totalPages)">Last</a>
+      </li>
+    </ul>
+  </nav>
+</template>
+
+<script>
+import {getCurrentInstance} from "vue";
+
+export default {
+  props:{
+    currentPage:{
+      type:Number,
+      required: true
+    },
+    totalPages:{
+      type:Number,
+      required: true
+    }
+  },
+  emits:['page_click'],
+  setup(){
+    const {emit} = getCurrentInstance();
+    const onClick=(page)=>{
+      emit("page_click",page);
+    }
+    return {
+      onClick
+    }
+  }
+}
+
+</script>
+
+<style scoped>
+
+</style>
+```
+해당 list 페이지에 사용하기
+```vue
+<template>
+  <Pagination
+      v-if="todoList.length"
+      @page_click="getTodos"
+      :current-page="currentPage"
+      :total-pages="totalPages"
+  />
+</template>
 ```
