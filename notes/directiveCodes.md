@@ -209,6 +209,83 @@ ref에서도 Collection을 쓸수 있으나 script내에서 값을 꺼낼 때 �
         </label>
     </div>
 ```
+#### d. [커스텀 컴포넌트에서 v-model 사용하기](https://vuejs.org/guide/components/v-model.html)
+여러 데이터를 연결하는 경우
+```vue
+<script>
+  export default {
+//props로 연결
+    props:{
+      label: {
+        type: String,
+        required: true,
+      },
+      errorMessage:{
+        type: String,
+        required: true,
+      },
+      subject: {
+        type: String,
+        required: true,
+      },
+      password: {
+        type: String,
+        required: true,
+      }
+    },
+    setup(props, {emit}){
+      const onInputSubject = (e)=>{
+        // emit('update-subject', e.target.value);
+        emit('update:subject',e.target.value);
+      }
+      //update: propsName
+      const onInputPassword = e =>{
+        emit('update:password',e.target.value);
+      }
+      return {
+        onInputSubject,
+        onInputPassword,
+      }
+    }
+  }
+</script>
+```
+따로 업데이트 function 연결 없이 사용
+```vue
+<Input
+    label="Subject"
+    v-model:subject="todo.subject"
+    v-model:password="todo.password"
+    :error-message="errorMessage"
+/>
+```
+하나만 연결하는 경우 
+```vue
+<template>
+  <Input
+    v-model="email"
+  />
+</template>
+```
+내부 컴포넌트
+```vue
+<script>
+  export default {
+      props: {
+          //따로 이름을 정하지않을 때의 명칭
+          modelValue:{
+            type: String,
+            required: true
+          }
+      },
+    setup(props,{emit}){
+          const onInput = e=>{
+              emit('update:modelValue',e.target.value);
+          }
+    }
+  }
+</script>
+```
 ### 4. v-for="(element,index,array) in Collection객체"
 map과 매개변수 배치가 유사함
 ```vue
