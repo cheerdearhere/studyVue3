@@ -128,7 +128,26 @@ export default {
 }
 </script>
 ```
+props를 쓰지 않는 경우(필수는 아님)
 
+getCurrentInstance 사용. 
+```vue
+<script>
+  import {getCurrentInstance} from "vue";
+  export default {
+      setup(){
+          const {emit} = getCurrentInstance();
+          const useOnlyEmit = e =>{
+              emit("update:emit",e.target.value);
+          }
+          return{
+              useOnlyEmit,
+          }
+      }
+  }
+</script>
+
+```
 #### b. parent > child : props
 부모 컴포넌트에서 전달할 대상을 입력
 
@@ -211,4 +230,48 @@ export default {
   }
 }
 </script>
+```
+
+### 3. toRefs: 
+reactive 객체는 연동되지만 그 내부의 값은 reactive하지 않다
+```javascript
+export const useCount =()=>{
+    const state  = reactive({
+        count: 0,
+    });
+    return state;
+}
+```
+외부로 호출된 객체는 reactive하지 않음
+```vue
+<template>
+  <div>
+    <div>{{ count }}</div>
+<!--  버튼을 눌러도 반응하지 않음  -->
+    <button @click="count++">Add</button>
+  </div>
+</template>
+<script>
+import {useCount} from "@/composables/useCount";
+
+export default {
+  setup(){
+    const {count} = useCount();
+    return {
+      count,
+    }
+  }
+}
+</script>
+```
+toRefs 적용하기
+```javascript
+import {reactive, toRefs} from "vue";
+
+export const useCount =()=>{
+    const state  = reactive({
+        count: 0,
+    });
+    return toRefs(state);
+}
 ```
