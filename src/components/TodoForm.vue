@@ -4,13 +4,14 @@
   >
     <div class="row">
       <div class="col-8">
-        <div class="form-group">
-          <label for="subject">subject</label>
-          <input v-model="todo.subject" type="text" id="subject" class="form-control"/>
-          <div v-if="errorMessage" class="errorMessage">
-            {{errorMessage}}
-          </div>
-        </div>
+        <Input
+            label="Subject"
+            v-model:subject="todo.subject"
+            :error-message="errorMessage"
+        />
+        <!--    v-model 이용하면 따로 bind, on을 처리할 필요 없음    -->
+        <!--            :subject="todo.subject" -->
+        <!--            @update-subject="updateTodoSubject"-->
       </div>
       <div class="col-4"  v-if="editing">
         <div class="form-group">
@@ -78,12 +79,14 @@ import {useToast} from "@/composables/toast";
 import {useRoute, useRouter} from "vue-router";
 import SaveModal from "@/components/SaveModal.vue";
 import DeleteModal from "@/components/DeleteModal.vue";
+import Input from "@/components/Input.vue";
 export default {
   components: {
     DeleteModal,
     SaveModal,
     Toast,
     TodoSimpleForm,
+    Input,
   },
   props:{
     editing:{//editing true > 수정 페이지
@@ -157,7 +160,9 @@ export default {
       }
       return true;
     }
-
+  // const updateTodoSubject = (newSubject) =>{
+  //     todo.value.subject = newSubject;
+  // }
     const onSave = async () =>{
       const updateData = todo.value;
       if(!todoValidation(updateData)) {
@@ -207,6 +212,7 @@ export default {
       onSave,
       goList,
       resetTodo,
+      // updateTodoSubject,
     }
   }
 }
