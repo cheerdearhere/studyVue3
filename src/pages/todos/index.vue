@@ -31,44 +31,15 @@
       </div>
     </div>
     <div class="paging">
-      <nav aria-label="Page navigation">
-        <ul class="pagination">
-          <li v-if="currentPage !== 1" class="page-item" >
-            <a class="page-link" href="#" @click.prevent="getTodos(1)">First</a>
-          </li>
-          <li class="page-item" :class="currentPage === 1?'disabled':''">
-            <a class="page-link" href="#" disabled="{{currentPage !== 1}}" @click.prevent="getTodos(currentPage-1)">prev</a>
-          </li>
-          <li
-              v-for="page in totalPages"
-              :key ="page"
-              class="page-item"
-              :class="currentPage===page?'active':''"
-          >
-            <a class="page-link" href="" @click.prevent="getTodos(page)" >
-              {{page}}
-            </a>
-          </li>
-          <li class="page-item" :class="currentPage === totalPages?'disabled':''">
-            <a class="page-link" href="#" disabled="{{currentPage !== totalPages}}" @click.prevent="getTodos(currentPage+1)">Next</a>
-          </li>
-          <li class="page-item" :class="currentPage === totalPages?'disabled':''">
-            <a class="page-link" href="#" disabled="{{currentPage !== totalPages}}" @click.prevent="getTodos(totalPages)">Last</a>
-          </li>
-        </ul>
-      </nav>
+      <Pagination
+        v-if="todoList.length"
+        @page_click="getTodos"
+        :current-page="currentPage"
+        :total-pages="totalPages"
+      />
     </div>
     <div class="footer"></div>
   </div>
-  <teleport to="#resultAlert">
-    <transition name="infoSlide">
-      <Toast
-          v-show="showToast"
-          :message="toastMessage"
-          :status="toastResStatus"
-      />
-    </transition>
-  </teleport>
 </template>
 
 <script>
@@ -82,9 +53,11 @@ import {todoHost} from "@/router";
 import Toast from "@/components/Toast.vue";
 import {useToast} from "@/composables/toast";
 import {useRouter} from "vue-router";
+import Pagination from "@/components/Pagination.vue";
 
 export default {
   components:{
+    Pagination,
     ComputedCount,
     TodoList,
     UseRef,
@@ -166,7 +139,7 @@ export default {
         todoList.value = rs.data;
         totalCnt.value = rs.headers['x-total-count'];
       }catch (error){
-        triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,false);
+        triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,"danger");
       }
     }
     getTodos(1);//mount 실행
@@ -193,23 +166,23 @@ export default {
         completed: todo.completed,
       }).then(rs=>{
         console.log(rs);
-        triggerToast(`데이터가 추가됨 \n id: ${rs.data.id}/ subject: ${rs.data.subject}`,true);
+        triggerToast(`데이터가 추가됨 \n id: ${rs.data.id}/ subject: ${rs.data.subject}`,"success");
         //context.emit(데이터이름,데이터 obj)에서 전달받은 것
-      }).catch(error=> triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,false));
+      }).catch(error=> triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,"danger"));
     }
     const toggleTodo=async (idx, checked)=>{
       error.value='';
       const id = todoList.value[idx].id;
       try{
-        const result = await axios.patch(`${todoHost}/${id}`,{
+        await axios.patch(`${todoHost}/${id}`,{
           completed: checked,//!todoList.value[idx].completed
         });
-        triggerToast(`${todoList.value[idx].id} 번 ${!checked?"-re-":"-완-"}`,true);
+        triggerToast(`${todoList.value[idx].id} 번 ${checked?"-완-":"-re-"}`,checked?"success":"danger");
       }catch (error){
-        triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,false);
+        triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,"danger");
       }finally {
         getTodos()
-            .catch(error=>triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,false));
+            .catch(error=>triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,"danger"));
       }
     }
     const deleteTodo= async (todoId)=>{
@@ -217,12 +190,12 @@ export default {
       await axios.delete(`${todoHost}/${todoId}`)
           .then(rs=>{
             if(rs.status !== HttpStatusCode.Ok){
-              triggerToast(`${rs.statusText}: ${rs.status}`,false)
+              triggerToast(`${rs.statusText}: ${rs.status}`,"danger")
             }
             getTodos(1);
-            triggerToast(`데이터가 삭제됨(${rs.status})`,true);
+            triggerToast(`데이터가 삭제됨(${rs.status})`,"success");
           })
-          .catch(error=>triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,false));
+          .catch(error=>triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,"danger"));
     }
     const goCreate = () =>{
       router.push({

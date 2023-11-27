@@ -42,15 +42,6 @@
       </div>
     </form>
   </div>
-  <teleport to="#resultAlert">
-    <transition name="infoSlide">
-      <Toast
-          v-show="showToast"
-          :message="toastMessage"
-          :status="toastResStatus"
-      />
-    </transition>
-  </teleport>
 </template>
 
 <script setup>
@@ -117,14 +108,14 @@ const onSave = async () =>{
     const res = await axios.put(`${todoHost}/${id}`,{ ...updateData });
     const {status, statusText} = res;
     if(status !== 200) {//throw new Error("server Error: failed save");
-      triggerToast(`Error : ${statusText} (code: ${status})`,false);
+      triggerToast(`Error : ${statusText} (code: ${status})`,"danger");
     }else{
-      triggerToast(`Success : Saved Todo`,true);
+      triggerToast(`Success : Saved Todo`,"success");
       originTodo.value = {...res.data};
     }
   }
   catch (error){
-    triggerToast(`${error.name}: ${error.message} (code: ${error.code})`);
+    triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,"danger");
   }
 }
 onBeforeMount(()=>{

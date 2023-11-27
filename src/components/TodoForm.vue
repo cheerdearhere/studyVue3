@@ -57,15 +57,6 @@
 <!--        @onSave="onSave"-->
 <!--    />-->
 <!--  </teleport>-->
-  <teleport to="#resultAlert">
-    <transition name="infoSlide">
-      <Toast
-          v-show="showToast"
-          :message="toastMessage"
-          :status="toastResStatus"
-      />
-    </transition>
-  </teleport>
 </template>
 
 <script>
@@ -80,6 +71,7 @@ import {useRoute, useRouter} from "vue-router";
 import SaveModal from "@/components/SaveModal.vue";
 import DeleteModal from "@/components/DeleteModal.vue";
 import Input from "@/components/Input.vue";
+
 export default {
   components: {
     DeleteModal,
@@ -112,15 +104,12 @@ export default {
       showToast,
       triggerToast,
     } = useToast();
-
-
     const id = route.params.id;
-
     const getTodo = async ()=>{
       loading.value=true;
       const res = await axios.get(`${todoHost}/${id}`);
       if(res.status !== 200) {
-        triggerToast("Not found", false);
+        triggerToast("Not found", "danger");
         throw new Error("check the todo's id");
       }
       todo.value = {...res.data};
@@ -166,7 +155,7 @@ export default {
     const onSave = async () =>{
       const updateData = todo.value;
       if(!todoValidation(updateData)) {
-        triggerToast(errorMessage.value,false);
+        triggerToast(errorMessage.value,"danger");
         return ;
       }
       try{
@@ -180,9 +169,9 @@ export default {
 
         const {status, statusText} = res;
         if(status !== HttpStatusCode.Ok && status !== HttpStatusCode.Created ) {
-          triggerToast(`Error : ${statusText} (code: ${status})`,false);
+          triggerToast(`Error : ${statusText} (code: ${status})`,"danger");
         }else{
-          triggerToast(`Success : ${props.editing ? "Updated" : "Created"}`,true);
+          triggerToast(`Success : ${props.editing ? "Updated" : "Created"}`,"success");
           if(props.editing){
             originTodo.value = {...res.data};
           }
@@ -194,7 +183,7 @@ export default {
         }
       }
       catch (error){
-        triggerToast(`${error.name}: ${error.message} (code: ${error.code})`);
+        triggerToast(`${error.name}: ${error.message} (code: ${error.code})`,"danger");
       }
     }
     return {
@@ -235,18 +224,4 @@ export default {
   color: red;
 }
 
-.infoSlide-enter-active,
-.infoSlide-leave-active {
-  transition: all 0.3s ease;
-}
-.infoSlide-enter-from,
-.infoSlide-leave-to {
-  opacity: 0;
-  transform: translateY(-30px);
-}
-.infoSlide-enter-to,
-.infoSlide-leave-from {
-  opacity: 1;
-  transform: translateY(0px);
-}
 </style>
